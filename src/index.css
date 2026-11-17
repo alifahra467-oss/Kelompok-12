@@ -1,0 +1,49 @@
+@import "tailwindcss";
+
+@theme {
+  --font-display: "Outfit", "Plus Jakarta Sans", system-ui, sans-serif;
+  --font-sans: "Plus Jakarta Sans", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+  --font-arabic: "Amiri", "Noto Naskh Arabic", serif;
+
+  --color-navy-deep: #0E2142;
+  --color-navy-stage: #08142A;
+  --color-electric-blue: #2563EB;
+  --color-gold-accent: #F1C56C;
+  --color-slate-soft: #F1F5F9;
+
+  --color-stiu-ivory: #FAF8F5;
+  --color-stiu-sage: #E2EFEA;
+  --color-stiu-emerald: #2E7D67;
+  --color-stiu-emerald-dark: #1B5E4B;
+  --color-stiu-gold: #D4AF37;
+}
+
+@layer base {
+  html {
+    font-family: var(--font-sans);
+  }
+
+  h1, h2, h3, .font-display {
+    font-family: var(--font-display);
+  }
+
+  .tabular-nums {
+    font-variant-numeric: tabular-nums;
+  }
+
+  [dir="rtl"], .font-arabic {
+    font-family: var(--font-arabic);
+    line-height: 1.9;
+  }
+}
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  body {
+    background: #FFFFFF !important;
+    color: #0E2142 !important;
+  }
+}

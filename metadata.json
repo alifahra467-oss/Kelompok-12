@@ -1,0 +1,6 @@
+{
+  "name": "ARENA KELAS 2.0",
+  "description": "Platform kompetisi kuis akademik real-time untuk satu mata kuliah universitas dengan tiga mode permainan: Cerdas Cermat, Papan Tantangan, dan Tantangan Analisis.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

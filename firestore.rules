@@ -1,0 +1,838 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Global safety net: deny everything by default
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Core primitive helpers
+    function isValidId(id) {
+      return id is string && id.size() >= 1 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isVerifiedUser() {
+      return isSignedIn() && request.auth.token.email_verified == true && request.auth.token.email is string;
+    }
+
+    function isLecturer() {
+      return isVerifiedUser() && (
+        request.auth.token.email == 'alifahra467@gmail.com' ||
+        exists(/databases/$(database)/documents/approved_lecturers/$(request.auth.token.email))
+      );
+    }
+
+    // Validation helpers (Anti-Update-Gap)
+    function isValidCourse(data) {
+      return data.keys().hasAll(['courseId', 'title', 'lecturerName', 'semester', 'updatedAt']) &&
+        data.keys().hasOnly(['courseId', 'title', 'description', 'lecturerName', 'semester', 'logoUrl', 'updatedAt']) &&
+        isValidId(data.courseId) &&
+        data.title is string && data.title.size() >= 2 && data.title.size() <= 160 &&
+        (!('description' in data) || (data.description is string && data.description.size() <= 1500)) &&
+        data.lecturerName is string && data.lecturerName.size() >= 2 && data.lecturerName.size() <= 120 &&
+        data.semester is string && data.semester.size() >= 1 && data.semester.size() <= 60 &&
+        (!('logoUrl' in data) || (data.logoUrl is string && data.logoUrl.size() <= 500)) &&
+        data.updatedAt is timestamp;
+    }
+
+    function isValidApprovedLecturer(data) {
+      return data.keys().hasAll(['email', 'createdAt']) &&
+        data.keys().hasOnly(['email', 'name', 'addedBy', 'createdAt']) &&
+        data.email is string && data.email.size() >= 3 && data.email.size() <= 120 &&
+        (!('name' in data) || (data.name is string && data.name.size() <= 120)) &&
+        (!('addedBy' in data) || (data.addedBy is string && data.addedBy.size() <= 120)) &&
+        data.createdAt is timestamp;
+    }
+
+    function isValidTopic(data) {
+      return data.keys().hasAll(['topicId', 'name', 'subtopics', 'orderIndex', 'updatedAt']) &&
+        data.keys().hasOnly(['topicId', 'name', 'description', 'subtopics', 'orderIndex', 'updatedAt']) &&
+        isValidId(data.topicId) &&
+        data.name is string && data.name.size() >= 1 && data.name.size() <= 120 &&
+        (!('description' in data) || (data.description is string && data.description.size() <= 500)) &&
+        data.subtopics is list && data.subtopics.size() <= 30 &&
+        (data.subtopics.size() == 0 || data.subtopics[0] is string) &&
+        data.orderIndex is number && data.orderIndex >= 0 && data.orderIndex <= 1000 &&
+        data.updatedAt is timestamp;
+    }
+
+    function isValidQuestionPrivate(data) {
+      return data.keys().hasAll(['questionId', 'topicName', 'type', 'questionText', 'correctAnswer', 'difficulty', 'points', 'timeLimitSec', 'enabledModes', 'isActive', 'createdAt', 'updatedAt']) &&
+        data.keys().hasOnly(['questionId', 'topicId', 'topicName', 'subtopic', 'type', 'questionText', 'options', 'correctAnswer', 'explanation', 'reference', 'difficulty', 'points', 'timeLimitSec', 'enabledModes', 'imageUrl', 'referenceRequirement', 'isActive', 'isDemo', 'createdAt', 'updatedAt']) &&
+        isValidId(data.questionId) &&
+        (!('topicId' in data) || (data.topicId is string && data.topicId.size() <= 128)) &&
+        data.topicName is string && data.topicName.size() >= 1 && data.topicName.size() <= 120 &&
+        (!('subtopic' in data) || (data.subtopic is string && data.subtopic.size() <= 120)) &&
+        data.type in ['MULTIPLE_CHOICE', 'TRUE_FALSE', 'SHORT_ANSWER', 'ESSAY_CASE'] &&
+        data.questionText is string && data.questionText.size() >= 1 && data.questionText.size() <= 5000 &&
+        (!('options' in data) || (data.options is list && data.options.size() <= 6 && (data.options.size() == 0 || data.options[0] is string))) &&
+        data.correctAnswer is string && data.correctAnswer.size() <= 2000 &&
+        (!('explanation' in data) || (data.explanation is string && data.explanation.size() <= 5000)) &&
+        (!('reference' in data) || (data.reference is string && data.reference.size() <= 500)) &&
+        data.difficulty in ['MUDAH', 'SEDANG', 'SULIT'] &&
+        data.points is number && data.points >= 1 && data.points <= 5000 &&
+        data.timeLimitSec is number && data.timeLimitSec >= 5 && data.timeLimitSec <= 3600 &&
+        data.enabledModes is list && data.enabledModes.size() >= 1 && data.enabledModes.size() <= 3 &&
+        data.enabledModes[0] in ['CERDAS_CERMAT', 'PAPAN_TANTANGAN', 'TANTANGAN_ANALISIS'] &&
+        (!('imageUrl' in data) || (data.imageUrl is string && data.imageUrl.size() <= 1000)) &&
+        (!('referenceRequirement' in data) || (data.referenceRequirement is string && data.referenceRequirement.size() <= 500)) &&
+        data.isActive is bool &&
+        (!('isDemo' in data) || data.isDemo is bool) &&
+        data.createdAt is timestamp &&
+        data.updatedAt is timestamp;
+    }
+
+    function isValidSession(data) {
+      return data.keys().hasAll([
+          'sessionId', 'title', 'gameMode', 'status', 'joinCode', 'requireJoinApproval',
+          'isJoinLocked', 'submissionMode', 'buzzerOpen', 'buzzerAttempt', 'submissionsOpen',
+          'timerRunning', 'answerRevealed', 'explanationRevealed', 'statsReleased',
+          'createdByUid', 'createdAt', 'updatedAt'
+        ]) &&
+        data.keys().hasOnly([
+          'sessionId', 'title', 'meetingLabel', 'gameMode', 'status', 'joinCode',
+          'requireJoinApproval', 'isJoinLocked', 'submissionMode', 'cerdasCermatRound',
+          'activeQuestionId', 'activeQuestionNumber', 'activeTeamId', 'authorizedTeamId',
+          'buzzerOpen', 'buzzerAttempt', 'buzzerWinnerTeamId', 'buzzerWinnerTeamName',
+          'buzzerWinnerParticipantName', 'submissionsOpen', 'timerRunning',
+          'timerDurationSec', 'timerRemainingSec', 'timerEndTimeMs', 'submissionDeadline',
+          'answerRevealed', 'revealedAnswer', 'explanationRevealed', 'revealedExplanation',
+          'revealedReference', 'statsReleased', 'questionStats', 'scoringConfig', 'boardConfig',
+          'createdByUid', 'createdAt', 'updatedAt'
+        ]) &&
+        isValidId(data.sessionId) &&
+        data.title is string && data.title.size() >= 2 && data.title.size() <= 160 &&
+        (!('meetingLabel' in data) || (data.meetingLabel is string && data.meetingLabel.size() <= 120)) &&
+        data.gameMode in ['CERDAS_CERMAT', 'PAPAN_TANTANGAN', 'TANTANGAN_ANALISIS'] &&
+        data.status in ['DRAFT', 'LOBBY', 'ACTIVE', 'PAUSED', 'REVIEWING', 'FINISHED'] &&
+        data.joinCode is string && data.joinCode.matches('^[0-9]{6}$') &&
+        data.requireJoinApproval is bool &&
+        data.isJoinLocked is bool &&
+        data.submissionMode in ['CAPTAIN_ONLY', 'INDIVIDUAL', 'TEAM_CONSENSUS'] &&
+        (!('cerdasCermatRound' in data) || data.cerdasCermatRound in ['WAJIB', 'LEMPARAN', 'REBUTAN']) &&
+        (!('activeQuestionId' in data) || data.activeQuestionId == null || (data.activeQuestionId is string && data.activeQuestionId.size() <= 128)) &&
+        (!('activeQuestionNumber' in data) || (data.activeQuestionNumber is number && data.activeQuestionNumber >= 0)) &&
+        (!('activeTeamId' in data) || data.activeTeamId == null || (data.activeTeamId is string && data.activeTeamId.size() <= 128)) &&
+        (!('authorizedTeamId' in data) || data.authorizedTeamId == null || (data.authorizedTeamId is string && data.authorizedTeamId.size() <= 128)) &&
+        data.buzzerOpen is bool &&
+        data.buzzerAttempt is number && data.buzzerAttempt >= 0 &&
+        (!('buzzerWinnerTeamId' in data) || data.buzzerWinnerTeamId == null || (data.buzzerWinnerTeamId is string && data.buzzerWinnerTeamId.size() <= 128)) &&
+        (!('buzzerWinnerTeamName' in data) || data.buzzerWinnerTeamName == null || (data.buzzerWinnerTeamName is string && data.buzzerWinnerTeamName.size() <= 80)) &&
+        (!('buzzerWinnerParticipantName' in data) || data.buzzerWinnerParticipantName == null || (data.buzzerWinnerParticipantName is string && data.buzzerWinnerParticipantName.size() <= 60)) &&
+        data.submissionsOpen is bool &&
+        data.timerRunning is bool &&
+        (!('timerDurationSec' in data) || (data.timerDurationSec is number && data.timerDurationSec >= 0)) &&
+        (!('timerRemainingSec' in data) || (data.timerRemainingSec is number && data.timerRemainingSec >= 0)) &&
+        (!('timerEndTimeMs' in data) || data.timerEndTimeMs == null || data.timerEndTimeMs is number) &&
+        (!('submissionDeadline' in data) || data.submissionDeadline == null || data.submissionDeadline is timestamp) &&
+        data.answerRevealed is bool &&
+        (!('revealedAnswer' in data) || data.revealedAnswer == null || (data.revealedAnswer is string && data.revealedAnswer.size() <= 2000)) &&
+        data.explanationRevealed is bool &&
+        (!('revealedExplanation' in data) || data.revealedExplanation == null || (data.revealedExplanation is string && data.revealedExplanation.size() <= 5000)) &&
+        (!('revealedReference' in data) || data.revealedReference == null || (data.revealedReference is string && data.revealedReference.size() <= 500)) &&
+        data.statsReleased is bool &&
+        (!('questionStats' in data) || data.questionStats == null || data.questionStats is map) &&
+        (!('scoringConfig' in data) || data.scoringConfig is map) &&
+        (!('boardConfig' in data) || data.boardConfig is map) &&
+        data.createdByUid is string && data.createdByUid.size() >= 1 && data.createdByUid.size() <= 128 &&
+        data.createdAt is timestamp &&
+        data.updatedAt is timestamp;
+    }
+
+    function isValidPublicQuestion(data) {
+      return data.keys().hasAll(['questionId', 'topicName', 'type', 'questionText', 'points', 'timeLimitSec', 'releasedAt']) &&
+        data.keys().hasOnly(['questionId', 'topicName', 'subtopic', 'type', 'questionText', 'options', 'difficulty', 'points', 'timeLimitSec', 'imageUrl', 'referenceRequirement', 'releasedAt']) &&
+        isValidId(data.questionId) &&
+        data.topicName is string && data.topicName.size() <= 120 &&
+        (!('subtopic' in data) || (data.subtopic is string && data.subtopic.size() <= 120)) &&
+        data.type in ['MULTIPLE_CHOICE', 'TRUE_FALSE', 'SHORT_ANSWER', 'ESSAY_CASE'] &&
+        data.questionText is string && data.questionText.size() >= 1 && data.questionText.size() <= 5000 &&
+        (!('options' in data) || (data.options is list && data.options.size() <= 6 && (data.options.size() == 0 || data.options[0] is string))) &&
+        (!('difficulty' in data) || data.difficulty in ['MUDAH', 'SEDANG', 'SULIT']) &&
+        data.points is number && data.points >= 1 && data.points <= 5000 &&
+        data.timeLimitSec is number && data.timeLimitSec >= 5 && data.timeLimitSec <= 3600 &&
+        (!('imageUrl' in data) || (data.imageUrl is string && data.imageUrl.size() <= 1000)) &&
+        (!('referenceRequirement' in data) || (data.referenceRequirement is string && data.referenceRequirement.size() <= 500)) &&
+        data.releasedAt is timestamp;
+    }
+
+    function isValidTeam(data) {
+      return data.keys().hasAll(['teamId', 'name', 'color', 'score', 'orderIndex', 'updatedAt']) &&
+        data.keys().hasOnly(['teamId', 'name', 'color', 'score', 'captainParticipantId', 'captainName', 'orderIndex', 'updatedAt']) &&
+        isValidId(data.teamId) &&
+        data.name is string && data.name.size() >= 1 && data.name.size() <= 80 &&
+        data.color is string && data.color.size() >= 4 && data.color.size() <= 20 &&
+        data.score is number && data.score >= -100000 && data.score <= 1000000 &&
+        (!('captainParticipantId' in data) || data.captainParticipantId == null || (data.captainParticipantId is string && data.captainParticipantId.size() <= 128)) &&
+        (!('captainName' in data) || data.captainName == null || (data.captainName is string && data.captainName.size() <= 60)) &&
+        data.orderIndex is number && data.orderIndex >= 0 && data.orderIndex <= 50 &&
+        data.updatedAt is timestamp;
+    }
+
+    function isValidParticipant(data) {
+      return data.keys().hasAll(['participantId', 'displayName', 'teamId', 'status', 'isCaptain', 'isConnected', 'joinedAt', 'lastSeenAt']) &&
+        data.keys().hasOnly(['participantId', 'displayName', 'teamId', 'status', 'isCaptain', 'isConnected', 'joinedAt', 'lastSeenAt']) &&
+        isValidId(data.participantId) &&
+        data.displayName is string && data.displayName.size() >= 2 && data.displayName.size() <= 60 &&
+        isValidId(data.teamId) &&
+        data.status in ['PENDING', 'APPROVED', 'REJECTED', 'REMOVED'] &&
+        data.isCaptain is bool &&
+        data.isConnected is bool &&
+        data.joinedAt is timestamp &&
+        data.lastSeenAt is timestamp;
+    }
+
+    function isValidCredential(data) {
+      return data.keys().hasAll(['participantId', 'proofHash', 'createdAt']) &&
+        data.keys().hasOnly(['participantId', 'proofHash', 'createdAt']) &&
+        isValidId(data.participantId) &&
+        data.proofHash is string && data.proofHash.size() == 64 &&
+        data.createdAt is timestamp;
+    }
+
+    function isValidSubmission(data) {
+      return data.keys().hasAll(['submissionId', 'questionId', 'questionRoundKey', 'teamId', 'teamName', 'participantId', 'participantName', 'authProof', 'isGraded', 'awardedPoints', 'approvedForProjector', 'submittedAt']) &&
+        data.keys().hasOnly(['submissionId', 'questionId', 'questionRoundKey', 'teamId', 'teamName', 'participantId', 'participantName', 'authProof', 'selectedOption', 'answerText', 'argumentText', 'referenceText', 'isGraded', 'isCorrect', 'awardedPoints', 'rubricScores', 'lecturerFeedback', 'approvedForProjector', 'submittedAt']) &&
+        isValidId(data.submissionId) &&
+        isValidId(data.questionId) &&
+        isValidId(data.questionRoundKey) &&
+        isValidId(data.teamId) &&
+        data.teamName is string && data.teamName.size() >= 1 && data.teamName.size() <= 80 &&
+        isValidId(data.participantId) &&
+        data.participantName is string && data.participantName.size() >= 2 && data.participantName.size() <= 60 &&
+        data.authProof is string && data.authProof.size() >= 16 && data.authProof.size() <= 256 &&
+        (!('selectedOption' in data) || data.selectedOption == null || (data.selectedOption is string && data.selectedOption.size() <= 1000)) &&
+        (!('answerText' in data) || (data.answerText is string && data.answerText.size() <= 5000)) &&
+        (!('argumentText' in data) || (data.argumentText is string && data.argumentText.size() <= 5000)) &&
+        (!('referenceText' in data) || (data.referenceText is string && data.referenceText.size() <= 1000)) &&
+        data.isGraded is bool &&
+        (!('isCorrect' in data) || data.isCorrect == null || data.isCorrect is bool) &&
+        data.awardedPoints is number && data.awardedPoints >= -5000 && data.awardedPoints <= 10000 &&
+        (!('rubricScores' in data) || data.rubricScores == null || data.rubricScores is map) &&
+        (!('lecturerFeedback' in data) || (data.lecturerFeedback is string && data.lecturerFeedback.size() <= 1500)) &&
+        data.approvedForProjector is bool &&
+        data.submittedAt is timestamp;
+    }
+
+    function isValidSubmissionReceipt(data) {
+      return data.keys().hasAll(['submissionId', 'questionRoundKey', 'questionId', 'teamId', 'teamName', 'participantId', 'participantName', 'status', 'awardedPoints', 'submittedAt']) &&
+        data.keys().hasOnly(['submissionId', 'questionRoundKey', 'questionId', 'teamId', 'teamName', 'participantId', 'participantName', 'status', 'isCorrect', 'awardedPoints', 'submittedAt']) &&
+        isValidId(data.submissionId) &&
+        isValidId(data.questionRoundKey) &&
+        isValidId(data.questionId) &&
+        isValidId(data.teamId) &&
+        data.teamName is string && data.teamName.size() >= 1 && data.teamName.size() <= 80 &&
+        isValidId(data.participantId) &&
+        data.participantName is string && data.participantName.size() >= 2 && data.participantName.size() <= 60 &&
+        data.status in ['SUBMITTED', 'GRADED'] &&
+        (!('isCorrect' in data) || data.isCorrect == null || data.isCorrect is bool) &&
+        data.awardedPoints is number && data.awardedPoints >= -5000 && data.awardedPoints <= 10000 &&
+        data.submittedAt is timestamp;
+    }
+
+    function isValidPublicResponse(data) {
+      return data.keys().hasAll(['responseId', 'questionId', 'questionRoundKey', 'anonymousLabel', 'answerText', 'awardedPoints', 'approvedAt']) &&
+        data.keys().hasOnly(['responseId', 'questionId', 'questionRoundKey', 'anonymousLabel', 'answerText', 'argumentText', 'referenceText', 'awardedPoints', 'approvedAt']) &&
+        isValidId(data.responseId) &&
+        isValidId(data.questionId) &&
+        isValidId(data.questionRoundKey) &&
+        data.anonymousLabel is string && data.anonymousLabel.size() >= 1 && data.anonymousLabel.size() <= 80 &&
+        data.answerText is string && data.answerText.size() <= 5000 &&
+        (!('argumentText' in data) || (data.argumentText is string && data.argumentText.size() <= 5000)) &&
+        (!('referenceText' in data) || (data.referenceText is string && data.referenceText.size() <= 1000)) &&
+        data.awardedPoints is number && data.awardedPoints >= -5000 && data.awardedPoints <= 10000 &&
+        data.approvedAt is timestamp;
+    }
+
+    function isValidBuzzerClaim(data) {
+      return data.keys().hasAll(['claimId', 'questionId', 'attempt', 'teamId', 'teamName', 'teamColor', 'participantId', 'participantName', 'claimedAt']) &&
+        data.keys().hasOnly(['claimId', 'questionId', 'attempt', 'teamId', 'teamName', 'teamColor', 'participantId', 'participantName', 'claimedAt']) &&
+        isValidId(data.claimId) &&
+        isValidId(data.questionId) &&
+        data.attempt is number && data.attempt >= 1 && data.attempt <= 1000 &&
+        isValidId(data.teamId) &&
+        data.teamName is string && data.teamName.size() >= 1 && data.teamName.size() <= 80 &&
+        data.teamColor is string && data.teamColor.size() >= 4 && data.teamColor.size() <= 20 &&
+        isValidId(data.participantId) &&
+        data.participantName is string && data.participantName.size() >= 2 && data.participantName.size() <= 60 &&
+        data.claimedAt is timestamp;
+    }
+
+    function isValidBuzzerProof(data) {
+      return data.keys().hasAll(['claimId', 'participantId', 'teamId', 'authProof', 'createdAt']) &&
+        data.keys().hasOnly(['claimId', 'participantId', 'teamId', 'authProof', 'createdAt']) &&
+        isValidId(data.claimId) &&
+        isValidId(data.participantId) &&
+        isValidId(data.teamId) &&
+        data.authProof is string && data.authProof.size() >= 16 && data.authProof.size() <= 256 &&
+        data.createdAt is timestamp;
+    }
+
+    function isValidBuzzerEvent(data) {
+      return data.keys().hasAll(['eventId', 'questionId', 'attempt', 'status', 'createdAt']) &&
+        data.keys().hasOnly(['eventId', 'questionId', 'attempt', 'teamId', 'teamName', 'participantId', 'participantName', 'status', 'createdAt']) &&
+        isValidId(data.eventId) &&
+        isValidId(data.questionId) &&
+        data.attempt is number && data.attempt >= 1 &&
+        (!('teamId' in data) || (data.teamId is string && data.teamId.size() <= 128)) &&
+        (!('teamName' in data) || (data.teamName is string && data.teamName.size() <= 80)) &&
+        (!('participantId' in data) || (data.participantId is string && data.participantId.size() <= 128)) &&
+        (!('participantName' in data) || (data.participantName is string && data.participantName.size() <= 60)) &&
+        data.status in ['WON', 'REJECTED', 'REOPENED'] &&
+        data.createdAt is timestamp;
+    }
+
+    function isValidScoreEvent(data) {
+      return data.keys().hasAll(['eventId', 'teamId', 'teamName', 'delta', 'previousScore', 'newScore', 'reason', 'type', 'undone', 'createdByUid', 'createdAt']) &&
+        data.keys().hasOnly(['eventId', 'teamId', 'teamName', 'questionId', 'submissionId', 'delta', 'previousScore', 'newScore', 'reason', 'type', 'undone', 'undoneByEventId', 'createdByUid', 'createdAt']) &&
+        isValidId(data.eventId) &&
+        isValidId(data.teamId) &&
+        data.teamName is string && data.teamName.size() >= 1 && data.teamName.size() <= 80 &&
+        (!('questionId' in data) || data.questionId == null || (data.questionId is string && data.questionId.size() <= 128)) &&
+        (!('submissionId' in data) || data.submissionId == null || (data.submissionId is string && data.submissionId.size() <= 128)) &&
+        data.delta is number && data.delta >= -50000 && data.delta <= 50000 &&
+        data.previousScore is number &&
+        data.newScore is number &&
+        data.reason is string && data.reason.size() >= 1 && data.reason.size() <= 300 &&
+        data.type in ['AWARD', 'PENALTY', 'MANUAL_ADJUST', 'RUBRIC_GRADE', 'UNDO'] &&
+        data.undone is bool &&
+        (!('undoneByEventId' in data) || data.undoneByEventId == null || (data.undoneByEventId is string && data.undoneByEventId.size() <= 128)) &&
+        data.createdByUid is string && data.createdByUid.size() >= 1 && data.createdByUid.size() <= 128 &&
+        data.createdAt is timestamp;
+    }
+
+    function isValidPretest(data) {
+      return data.keys().hasAll([
+          'pretestId', 'title', 'joinCode', 'status', 'useWeightedPoints',
+          'releaseAllQuestions', 'timerRunning', 'teamCount', 'captainsLocked',
+          'teamsLocked', 'teamsPublished', 'showResultsToStudents',
+          'createdByUid', 'createdAt', 'updatedAt'
+        ]) &&
+        data.keys().hasOnly([
+          'pretestId', 'title', 'meetingLabel', 'joinCode', 'status',
+          'useWeightedPoints', 'releaseAllQuestions', 'activeQuestionId',
+          'timerRunning', 'timerDurationSec', 'timerRemainingSec', 'timerEndTimeMs',
+          'submissionDeadline', 'teamCount', 'captainsLocked', 'teamsLocked',
+          'teamsPublished', 'showResultsToStudents', 'allocation',
+          'linkedSessionId', 'linkedGameMode', 'createdByUid', 'createdAt', 'updatedAt'
+        ]) &&
+        isValidId(data.pretestId) &&
+        data.title is string && data.title.size() >= 2 && data.title.size() <= 160 &&
+        (!('meetingLabel' in data) || (data.meetingLabel is string && data.meetingLabel.size() <= 120)) &&
+        data.joinCode is string && data.joinCode.matches('^[0-9]{6}$') &&
+        data.status in ['DRAFT', 'LOBBY', 'ACTIVE', 'PAUSED', 'FINISHED'] &&
+        data.useWeightedPoints is bool &&
+        data.releaseAllQuestions is bool &&
+        (!('activeQuestionId' in data) || data.activeQuestionId == null || (data.activeQuestionId is string && data.activeQuestionId.size() <= 128)) &&
+        data.timerRunning is bool &&
+        (!('timerDurationSec' in data) || (data.timerDurationSec is number && data.timerDurationSec >= 0)) &&
+        (!('timerRemainingSec' in data) || (data.timerRemainingSec is number && data.timerRemainingSec >= 0)) &&
+        (!('timerEndTimeMs' in data) || data.timerEndTimeMs == null || data.timerEndTimeMs is number) &&
+        (!('submissionDeadline' in data) || data.submissionDeadline == null || data.submissionDeadline is timestamp) &&
+        data.teamCount is number && data.teamCount >= 2 && data.teamCount <= 12 &&
+        data.captainsLocked is bool &&
+        data.teamsLocked is bool &&
+        data.teamsPublished is bool &&
+        data.showResultsToStudents is bool &&
+        (!('allocation' in data) || data.allocation == null || data.allocation is map) &&
+        (!('linkedSessionId' in data) || data.linkedSessionId == null || (data.linkedSessionId is string && data.linkedSessionId.size() <= 128)) &&
+        (!('linkedGameMode' in data) || data.linkedGameMode == null || data.linkedGameMode in ['CERDAS_CERMAT', 'PAPAN_TANTANGAN', 'TANTANGAN_ANALISIS']) &&
+        data.createdByUid is string && data.createdByUid.size() >= 1 && data.createdByUid.size() <= 128 &&
+        data.createdAt is timestamp &&
+        data.updatedAt is timestamp;
+    }
+
+    function isValidPretestQuestionPrivate(data) {
+      return data.keys().hasAll([
+          'questionId', 'questionText', 'options', 'correctAnswer', 'timeLimitSec',
+          'orderIndex', 'points', 'isTieBreak', 'releasedToProjector', 'createdAt', 'updatedAt'
+        ]) &&
+        data.keys().hasOnly([
+          'questionId', 'questionText', 'options', 'correctAnswer', 'explanation',
+          'timeLimitSec', 'orderIndex', 'points', 'isTieBreak', 'releasedToProjector',
+          'createdAt', 'updatedAt'
+        ]) &&
+        isValidId(data.questionId) &&
+        data.questionText is string && data.questionText.size() >= 1 && data.questionText.size() <= 5000 &&
+        data.options is list && data.options.size() >= 4 && data.options.size() <= 6 &&
+        data.options[0] is string &&
+        data.correctAnswer is string && data.correctAnswer.size() >= 1 && data.correctAnswer.size() <= 2000 &&
+        (!('explanation' in data) || (data.explanation is string && data.explanation.size() <= 5000)) &&
+        data.timeLimitSec is number && data.timeLimitSec >= 5 && data.timeLimitSec <= 3600 &&
+        data.orderIndex is number && data.orderIndex >= 0 && data.orderIndex <= 1000 &&
+        data.points is number && data.points >= 1 && data.points <= 1000 &&
+        data.isTieBreak is bool &&
+        data.releasedToProjector is bool &&
+        data.createdAt is timestamp &&
+        data.updatedAt is timestamp;
+    }
+
+    function isValidPretestQuestionPublic(data) {
+      return data.keys().hasAll([
+          'questionId', 'questionText', 'options', 'timeLimitSec',
+          'orderIndex', 'points', 'isTieBreak', 'answerRevealed', 'releasedAt'
+        ]) &&
+        data.keys().hasOnly([
+          'questionId', 'questionText', 'options', 'timeLimitSec',
+          'orderIndex', 'points', 'isTieBreak', 'answerRevealed',
+          'revealedAnswer', 'revealedExplanation', 'releasedAt'
+        ]) &&
+        isValidId(data.questionId) &&
+        data.questionText is string && data.questionText.size() >= 1 && data.questionText.size() <= 5000 &&
+        data.options is list && data.options.size() >= 4 && data.options.size() <= 6 &&
+        data.options[0] is string &&
+        data.timeLimitSec is number && data.timeLimitSec >= 5 && data.timeLimitSec <= 3600 &&
+        data.orderIndex is number && data.orderIndex >= 0 && data.orderIndex <= 1000 &&
+        data.points is number && data.points >= 1 && data.points <= 1000 &&
+        data.isTieBreak is bool &&
+        data.answerRevealed is bool &&
+        (!('revealedAnswer' in data) || data.revealedAnswer == null || (data.revealedAnswer is string && data.revealedAnswer.size() <= 2000)) &&
+        (!('revealedExplanation' in data) || data.revealedExplanation == null || (data.revealedExplanation is string && data.revealedExplanation.size() <= 5000)) &&
+        data.releasedAt is timestamp;
+    }
+
+    function isValidPretestParticipant(data) {
+      return data.keys().hasAll(['participantId', 'displayName', 'status', 'isConnected', 'joinedAt', 'lastSeenAt']) &&
+        data.keys().hasOnly(['participantId', 'displayName', 'status', 'isConnected', 'joinedAt', 'lastSeenAt']) &&
+        isValidId(data.participantId) &&
+        data.displayName is string && data.displayName.size() >= 2 && data.displayName.size() <= 60 &&
+        data.status in ['APPROVED', 'REMOVED'] &&
+        data.isConnected is bool &&
+        data.joinedAt is timestamp &&
+        data.lastSeenAt is timestamp;
+    }
+
+    function isValidPretestSubmission(data) {
+      return data.keys().hasAll(['submissionId', 'questionId', 'participantId', 'participantName', 'authProof', 'selectedOption', 'submittedAt']) &&
+        data.keys().hasOnly(['submissionId', 'questionId', 'participantId', 'participantName', 'authProof', 'selectedOption', 'submittedAt']) &&
+        isValidId(data.submissionId) &&
+        isValidId(data.questionId) &&
+        isValidId(data.participantId) &&
+        data.participantName is string && data.participantName.size() >= 2 && data.participantName.size() <= 60 &&
+        data.authProof is string && data.authProof.size() >= 16 && data.authProof.size() <= 256 &&
+        data.selectedOption is string && data.selectedOption.size() >= 1 && data.selectedOption.size() <= 1000 &&
+        data.submittedAt is timestamp;
+    }
+
+    function isValidPretestSubmissionReceipt(data) {
+      return data.keys().hasAll(['submissionId', 'questionId', 'participantId', 'participantName', 'submittedAt']) &&
+        data.keys().hasOnly(['submissionId', 'questionId', 'participantId', 'participantName', 'submittedAt']) &&
+        isValidId(data.submissionId) &&
+        isValidId(data.questionId) &&
+        isValidId(data.participantId) &&
+        data.participantName is string && data.participantName.size() >= 2 && data.participantName.size() <= 60 &&
+        data.submittedAt is timestamp;
+    }
+
+    function isValidPretestResult(data) {
+      return data.keys().hasAll(['participantId', 'displayName', 'totalCorrect', 'weightedScore', 'maxWeightedScore', 'totalQuestions', 'answeredCount', 'percentage', 'rank', 'isTied', 'updatedAt']) &&
+        data.keys().hasOnly(['participantId', 'displayName', 'totalCorrect', 'weightedScore', 'maxWeightedScore', 'totalQuestions', 'answeredCount', 'percentage', 'rank', 'isTied', 'updatedAt']) &&
+        isValidId(data.participantId) &&
+        data.displayName is string && data.displayName.size() >= 2 && data.displayName.size() <= 60 &&
+        data.totalCorrect is number && data.totalCorrect >= 0 &&
+        data.weightedScore is number && data.weightedScore >= 0 &&
+        data.maxWeightedScore is number && data.maxWeightedScore >= 0 &&
+        data.totalQuestions is number && data.totalQuestions >= 0 &&
+        data.answeredCount is number && data.answeredCount >= 0 &&
+        data.percentage is number && data.percentage >= 0 && data.percentage <= 100 &&
+        data.rank is number && data.rank >= 1 &&
+        data.isTied is bool &&
+        data.updatedAt is timestamp;
+    }
+
+    function isValidPretestAdminSummary(data) {
+      return data.keys().hasAll(['docId', 'proposedCaptains', 'memberScores', 'updatedAt']) &&
+        data.keys().hasOnly(['docId', 'proposedCaptains', 'balanceReport', 'memberScores', 'updatedAt']) &&
+        isValidId(data.docId) &&
+        data.proposedCaptains is list &&
+        (!('balanceReport' in data) || data.balanceReport == null || data.balanceReport is map) &&
+        data.memberScores is map &&
+        data.updatedAt is timestamp;
+    }
+
+    // 1. Course
+    match /course/{courseId} {
+      allow get: if isValidId(courseId);
+      allow list: if resource.data.title is string;
+      allow create, update: if isLecturer() && isValidId(courseId) && isValidCourse(incoming()) && incoming().updatedAt == request.time;
+      allow delete: if false;
+    }
+
+    // 2. Approved Lecturers (PII isolated to lecturers only)
+    match /approved_lecturers/{emailId} {
+      allow get: if isLecturer() && emailId is string && emailId.size() <= 120;
+      allow list: if isLecturer() && resource.data.email is string;
+      allow create, update: if isLecturer() &&
+        emailId is string && emailId.size() >= 3 && emailId.size() <= 120 &&
+        emailId.matches('^[^/]+@[^/]+\\.[^/]+$') &&
+        isValidApprovedLecturer(incoming()) &&
+        incoming().email == emailId &&
+        incoming().createdAt == request.time;
+      allow delete: if isLecturer() && emailId != 'alifahra467@gmail.com';
+    }
+
+    // 3. Topics
+    match /topics/{topicId} {
+      allow get: if isLecturer() && isValidId(topicId);
+      allow list: if isLecturer() && resource.data.name is string;
+      allow create, update: if isLecturer() && isValidId(topicId) && isValidTopic(incoming()) && incoming().updatedAt == request.time;
+      allow delete: if isLecturer() && isValidId(topicId);
+    }
+
+    // 4. Questions Private (Answer keys & explanations strictly lecturer-only)
+    match /questions_private/{questionId} {
+      allow get: if isLecturer() && isValidId(questionId);
+      allow list: if isLecturer() && resource.data.questionId is string;
+      allow create: if isLecturer() && isValidId(questionId) && isValidQuestionPrivate(incoming()) &&
+        incoming().createdAt == request.time && incoming().updatedAt == request.time;
+      allow update: if isLecturer() && isValidId(questionId) && isValidQuestionPrivate(incoming()) &&
+        incoming().createdAt == existing().createdAt && incoming().updatedAt == request.time;
+      allow delete: if isLecturer() && isValidId(questionId);
+    }
+
+    // 5. Sessions
+    match /sessions/{sessionId} {
+      allow get: if isValidId(sessionId);
+      allow list: if isLecturer() || (resource.data.status in ['LOBBY', 'ACTIVE', 'PAUSED', 'REVIEWING'] && resource.data.joinCode is string);
+      allow create: if isLecturer() && isValidId(sessionId) && isValidSession(incoming()) &&
+        incoming().createdByUid == request.auth.uid &&
+        incoming().createdAt == request.time && incoming().updatedAt == request.time;
+      allow update: if isLecturer() && isValidId(sessionId) && isValidSession(incoming()) &&
+        incoming().createdByUid == existing().createdByUid &&
+        incoming().createdAt == existing().createdAt &&
+        incoming().updatedAt == request.time;
+      allow delete: if isLecturer() && isValidId(sessionId);
+
+      // 6. Public Questions (sanitized, released only on open)
+      match /public_questions/{questionId} {
+        allow get: if isValidId(sessionId) && isValidId(questionId);
+        allow list: if resource.data.questionId is string;
+        allow create: if isLecturer() && isValidId(sessionId) && isValidId(questionId) &&
+          isValidPublicQuestion(incoming()) && incoming().releasedAt == request.time;
+        allow update: if isLecturer() && isValidId(sessionId) && isValidId(questionId) &&
+          isValidPublicQuestion(incoming()) && incoming().releasedAt == existing().releasedAt;
+        allow delete: if isLecturer() && isValidId(sessionId) && isValidId(questionId);
+      }
+
+      // 7. Teams
+      match /teams/{teamId} {
+        allow get: if isValidId(sessionId) && isValidId(teamId);
+        allow list: if resource.data.name is string;
+        allow create, update: if isLecturer() && isValidId(sessionId) && isValidId(teamId) &&
+          isValidTeam(incoming()) && incoming().updatedAt == request.time;
+        allow delete: if isLecturer() && isValidId(sessionId) && isValidId(teamId);
+      }
+
+      // 8. Participants
+      match /participants/{participantId} {
+        allow get: if isValidId(sessionId) && isValidId(participantId);
+        allow list: if resource.data.displayName is string;
+        allow create: if isValidId(sessionId) && isValidId(participantId) && isValidParticipant(incoming()) &&
+          incoming().participantId == participantId &&
+          incoming().joinedAt == request.time && incoming().lastSeenAt == request.time && (
+            isLecturer() || (
+              get(/databases/$(database)/documents/sessions/$(sessionId)).data.status in ['LOBBY', 'ACTIVE', 'PAUSED'] &&
+              get(/databases/$(database)/documents/sessions/$(sessionId)).data.isJoinLocked == false &&
+              exists(/databases/$(database)/documents/sessions/$(sessionId)/teams/$(incoming().teamId)) &&
+              incoming().isCaptain == false &&
+              incoming().status == (get(/databases/$(database)/documents/sessions/$(sessionId)).data.requireJoinApproval ? 'PENDING' : 'APPROVED') &&
+              existsAfter(/databases/$(database)/documents/sessions/$(sessionId)/participant_credentials/$(participantId))
+            )
+          );
+        allow update: if isValidId(sessionId) && isValidId(participantId) && isValidParticipant(incoming()) &&
+          incoming().participantId == existing().participantId &&
+          incoming().joinedAt == existing().joinedAt && (
+            isLecturer() || (
+              existing().status in ['PENDING', 'APPROVED'] &&
+              incoming().diff(existing()).affectedKeys().hasOnly(['isConnected', 'lastSeenAt']) &&
+              incoming().lastSeenAt == request.time
+            )
+          );
+        allow delete: if isLecturer() && isValidId(sessionId) && isValidId(participantId);
+      }
+
+      // 9. Participant Credentials (private SHA-256 proof hashes)
+      match /participant_credentials/{participantId} {
+        allow get: if isLecturer() && isValidId(sessionId) && isValidId(participantId);
+        allow list: if isLecturer() && resource.data.participantId is string;
+        allow create: if isValidId(sessionId) && isValidId(participantId) && isValidCredential(incoming()) &&
+          incoming().participantId == participantId &&
+          incoming().createdAt == request.time && (
+            isLecturer() || existsAfter(/databases/$(database)/documents/sessions/$(sessionId)/participants/$(participantId))
+          );
+        allow update, delete: if isLecturer() && isValidId(sessionId) && isValidId(participantId);
+      }
+
+      // 10. Submissions (private student answers readable only by lecturer)
+      match /submissions/{submissionId} {
+        allow get: if isLecturer() && isValidId(sessionId) && isValidId(submissionId);
+        allow list: if isLecturer() && resource.data.questionId is string;
+        allow create: if isValidId(sessionId) && isValidId(submissionId) && isValidSubmission(incoming()) &&
+          incoming().submissionId == submissionId &&
+          incoming().submittedAt == request.time &&
+          incoming().isGraded == false &&
+          incoming().awardedPoints == 0 &&
+          incoming().approvedForProjector == false && (
+            isLecturer() || (
+              get(/databases/$(database)/documents/sessions/$(sessionId)).data.status == 'ACTIVE' &&
+              get(/databases/$(database)/documents/sessions/$(sessionId)).data.submissionsOpen == true &&
+              get(/databases/$(database)/documents/sessions/$(sessionId)).data.activeQuestionId == incoming().questionId &&
+              (get(/databases/$(database)/documents/sessions/$(sessionId)).data.submissionMode == 'INDIVIDUAL'
+                ? submissionId == (incoming().questionRoundKey + '_' + incoming().participantId)
+                : submissionId == (incoming().questionRoundKey + '_' + incoming().teamId)) &&
+              (get(/databases/$(database)/documents/sessions/$(sessionId)).data.submissionDeadline == null ||
+                request.time <= get(/databases/$(database)/documents/sessions/$(sessionId)).data.submissionDeadline) &&
+              (get(/databases/$(database)/documents/sessions/$(sessionId)).data.authorizedTeamId == null ||
+                get(/databases/$(database)/documents/sessions/$(sessionId)).data.authorizedTeamId == incoming().teamId) &&
+              get(/databases/$(database)/documents/sessions/$(sessionId)/participants/$(incoming().participantId)).data.status == 'APPROVED' &&
+              get(/databases/$(database)/documents/sessions/$(sessionId)/participants/$(incoming().participantId)).data.teamId == incoming().teamId &&
+              (get(/databases/$(database)/documents/sessions/$(sessionId)).data.submissionMode != 'CAPTAIN_ONLY' ||
+                get(/databases/$(database)/documents/sessions/$(sessionId)/participants/$(incoming().participantId)).data.isCaptain == true) &&
+              hashing.sha256(incoming().authProof).toHexString().lower() ==
+                get(/databases/$(database)/documents/sessions/$(sessionId)/participant_credentials/$(incoming().participantId)).data.proofHash.lower() &&
+              existsAfter(/databases/$(database)/documents/sessions/$(sessionId)/submission_receipts/$(submissionId))
+            )
+          );
+        allow update: if isLecturer() && isValidId(sessionId) && isValidId(submissionId) && isValidSubmission(incoming()) &&
+          incoming().submissionId == existing().submissionId &&
+          incoming().submittedAt == existing().submittedAt;
+        allow delete: if isLecturer() && isValidId(sessionId) && isValidId(submissionId);
+      }
+
+      // 11. Submission Receipts (non-sensitive progress tracking)
+      match /submission_receipts/{submissionId} {
+        allow get: if isValidId(sessionId) && isValidId(submissionId);
+        allow list: if resource.data.questionRoundKey is string;
+        allow create: if isValidId(sessionId) && isValidId(submissionId) && isValidSubmissionReceipt(incoming()) &&
+          incoming().submissionId == submissionId &&
+          incoming().submittedAt == request.time &&
+          incoming().status == 'SUBMITTED' &&
+          incoming().awardedPoints == 0 && (
+            isLecturer() || existsAfter(/databases/$(database)/documents/sessions/$(sessionId)/submissions/$(submissionId))
+          );
+        allow update: if isLecturer() && isValidId(sessionId) && isValidId(submissionId) &&
+          isValidSubmissionReceipt(incoming()) && incoming().submittedAt == existing().submittedAt;
+        allow delete: if isLecturer() && isValidId(sessionId) && isValidId(submissionId);
+      }
+
+      // 12. Public Responses (lecturer-approved anonymous written answers)
+      match /public_responses/{responseId} {
+        allow get: if isValidId(sessionId) && isValidId(responseId);
+        allow list: if resource.data.questionId is string;
+        allow create, update: if isLecturer() && isValidId(sessionId) && isValidId(responseId) &&
+          isValidPublicResponse(incoming()) && incoming().approvedAt == request.time;
+        allow delete: if isLecturer() && isValidId(sessionId) && isValidId(responseId);
+      }
+
+      // 13. Buzzer Claims (atomic create-once winner lock)
+      match /buzzer_claims/{claimId} {
+        allow get: if isValidId(sessionId) && isValidId(claimId);
+        allow list: if resource.data.questionId is string;
+        allow create: if isValidId(sessionId) && isValidId(claimId) && isValidBuzzerClaim(incoming()) &&
+          incoming().claimId == claimId &&
+          incoming().claimedAt == request.time && (
+            isLecturer() || (
+              get(/databases/$(database)/documents/sessions/$(sessionId)).data.status == 'ACTIVE' &&
+              get(/databases/$(database)/documents/sessions/$(sessionId)).data.buzzerOpen == true &&
+              get(/databases/$(database)/documents/sessions/$(sessionId)).data.activeQuestionId == incoming().questionId &&
+              get(/databases/$(database)/documents/sessions/$(sessionId)).data.buzzerAttempt == incoming().attempt &&
+              claimId == (incoming().questionId + '_a' + string(incoming().attempt)) &&
+              existsAfter(/databases/$(database)/documents/sessions/$(sessionId)/buzzer_proofs/$(claimId)) &&
+              getAfter(/databases/$(database)/documents/sessions/$(sessionId)/buzzer_proofs/$(claimId)).data.participantId == incoming().participantId &&
+              getAfter(/databases/$(database)/documents/sessions/$(sessionId)/buzzer_proofs/$(claimId)).data.teamId == incoming().teamId
+            )
+          );
+        allow update: if isLecturer() && isValidId(sessionId) && isValidId(claimId) && isValidBuzzerClaim(incoming());
+        allow delete: if isLecturer() && isValidId(sessionId) && isValidId(claimId);
+      }
+
+      // 14. Buzzer Proofs (private credential proof paired with BuzzerClaim)
+      match /buzzer_proofs/{claimId} {
+        allow get: if isLecturer() && isValidId(sessionId) && isValidId(claimId);
+        allow list: if isLecturer() && resource.data.claimId is string;
+        allow create: if isValidId(sessionId) && isValidId(claimId) && isValidBuzzerProof(incoming()) &&
+          incoming().claimId == claimId &&
+          incoming().createdAt == request.time && (
+            isLecturer() || (
+              get(/databases/$(database)/documents/sessions/$(sessionId)/participants/$(incoming().participantId)).data.status == 'APPROVED' &&
+              get(/databases/$(database)/documents/sessions/$(sessionId)/participants/$(incoming().participantId)).data.teamId == incoming().teamId &&
+              hashing.sha256(incoming().authProof).toHexString().lower() ==
+                get(/databases/$(database)/documents/sessions/$(sessionId)/participant_credentials/$(incoming().participantId)).data.proofHash.lower() &&
+              existsAfter(/databases/$(database)/documents/sessions/$(sessionId)/buzzer_claims/$(claimId))
+            )
+          );
+        allow update, delete: if isLecturer() && isValidId(sessionId) && isValidId(claimId);
+      }
+
+      // 15. Buzzer Events
+      match /buzzer_events/{eventId} {
+        allow get: if isValidId(sessionId) && isValidId(eventId);
+        allow list: if resource.data.status is string;
+        allow create, update: if isLecturer() && isValidId(sessionId) && isValidId(eventId) &&
+          isValidBuzzerEvent(incoming()) && incoming().createdAt == request.time;
+        allow delete: if isLecturer() && isValidId(sessionId) && isValidId(eventId);
+      }
+
+      // 16. Score Events
+      match /score_events/{eventId} {
+        allow get: if isValidId(sessionId) && isValidId(eventId);
+        allow list: if resource.data.teamId is string;
+        allow create: if isLecturer() && isValidId(sessionId) && isValidId(eventId) &&
+          isValidScoreEvent(incoming()) &&
+          incoming().createdByUid == request.auth.uid &&
+          incoming().createdAt == request.time;
+        allow update: if isLecturer() && isValidId(sessionId) && isValidId(eventId) &&
+          isValidScoreEvent(incoming()) &&
+          incoming().createdByUid == existing().createdByUid &&
+          incoming().createdAt == existing().createdAt;
+        allow delete: if isLecturer() && isValidId(sessionId) && isValidId(eventId);
+      }
+    }
+
+    // 17. Pre-Tests & Balanced Team Spinner
+    match /pretests/{pretestId} {
+      allow get: if isValidId(pretestId);
+      allow list: if isLecturer() || (resource.data.status in ['LOBBY', 'ACTIVE', 'PAUSED'] && resource.data.joinCode is string);
+      allow create: if isLecturer() && isValidId(pretestId) && isValidPretest(incoming()) &&
+        incoming().createdByUid == request.auth.uid &&
+        incoming().createdAt == request.time && incoming().updatedAt == request.time;
+      allow update: if isLecturer() && isValidId(pretestId) && isValidPretest(incoming()) &&
+        incoming().createdByUid == existing().createdByUid &&
+        incoming().createdAt == existing().createdAt &&
+        incoming().updatedAt == request.time;
+      allow delete: if isLecturer() && isValidId(pretestId);
+
+      // Private Pre-Test Questions (Admin only)
+      match /questions_private/{questionId} {
+        allow get: if isLecturer() && isValidId(pretestId) && isValidId(questionId);
+        allow list: if isLecturer() && resource.data.questionId is string;
+        allow create: if isLecturer() && isValidId(pretestId) && isValidId(questionId) &&
+          isValidPretestQuestionPrivate(incoming()) &&
+          incoming().createdAt == request.time && incoming().updatedAt == request.time;
+        allow update: if isLecturer() && isValidId(pretestId) && isValidId(questionId) &&
+          isValidPretestQuestionPrivate(incoming()) &&
+          incoming().createdAt == existing().createdAt && incoming().updatedAt == request.time;
+        allow delete: if isLecturer() && isValidId(pretestId) && isValidId(questionId);
+      }
+
+      // Public Pre-Test Questions (Released to projector and students, no answer keys unless revealed)
+      match /questions_public/{questionId} {
+        allow get: if isValidId(pretestId) && isValidId(questionId);
+        allow list: if resource.data.questionId is string;
+        allow create: if isLecturer() && isValidId(pretestId) && isValidId(questionId) &&
+          isValidPretestQuestionPublic(incoming()) && incoming().releasedAt == request.time;
+        allow update: if isLecturer() && isValidId(pretestId) && isValidId(questionId) &&
+          isValidPretestQuestionPublic(incoming()) && incoming().releasedAt == existing().releasedAt;
+        allow delete: if isLecturer() && isValidId(pretestId) && isValidId(questionId);
+      }
+
+      // Pre-Test Participants
+      match /participants/{participantId} {
+        allow get: if isValidId(pretestId) && isValidId(participantId);
+        allow list: if resource.data.displayName is string;
+        allow create: if isValidId(pretestId) && isValidId(participantId) && isValidPretestParticipant(incoming()) &&
+          incoming().participantId == participantId &&
+          incoming().joinedAt == request.time && incoming().lastSeenAt == request.time && (
+            isLecturer() || (
+              get(/databases/$(database)/documents/pretests/$(pretestId)).data.status in ['LOBBY', 'ACTIVE', 'PAUSED'] &&
+              incoming().status == 'APPROVED' &&
+              existsAfter(/databases/$(database)/documents/pretests/$(pretestId)/participant_credentials/$(participantId))
+            )
+          );
+        allow update: if isValidId(pretestId) && isValidId(participantId) && isValidPretestParticipant(incoming()) &&
+          incoming().participantId == existing().participantId &&
+          incoming().joinedAt == existing().joinedAt && (
+            isLecturer() || (
+              existing().status == 'APPROVED' &&
+              incoming().diff(existing()).affectedKeys().hasOnly(['isConnected', 'lastSeenAt']) &&
+              incoming().lastSeenAt == request.time
+            )
+          );
+        allow delete: if isLecturer() && isValidId(pretestId) && isValidId(participantId);
+      }
+
+      // Pre-Test Participant Credentials (Private SHA-256 proof hashes)
+      match /participant_credentials/{participantId} {
+        allow get: if isLecturer() && isValidId(pretestId) && isValidId(participantId);
+        allow list: if isLecturer() && resource.data.participantId is string;
+        allow create: if isValidId(pretestId) && isValidId(participantId) && isValidCredential(incoming()) &&
+          incoming().participantId == participantId &&
+          incoming().createdAt == request.time && (
+            isLecturer() || existsAfter(/databases/$(database)/documents/pretests/$(pretestId)/participants/$(participantId))
+          );
+        allow update, delete: if isLecturer() && isValidId(pretestId) && isValidId(participantId);
+      }
+
+      // Pre-Test Submissions (Private student answers, Admin only)
+      match /submissions/{submissionId} {
+        allow get: if isLecturer() && isValidId(pretestId) && isValidId(submissionId);
+        allow list: if isLecturer() && resource.data.questionId is string;
+        allow create: if isValidId(pretestId) && isValidId(submissionId) && isValidPretestSubmission(incoming()) &&
+          incoming().submissionId == submissionId &&
+          incoming().submittedAt == request.time &&
+          submissionId == (incoming().questionId + '_' + incoming().participantId) && (
+            isLecturer() || (
+              get(/databases/$(database)/documents/pretests/$(pretestId)).data.status == 'ACTIVE' &&
+              (get(/databases/$(database)/documents/pretests/$(pretestId)).data.releaseAllQuestions == true ||
+                get(/databases/$(database)/documents/pretests/$(pretestId)).data.activeQuestionId == incoming().questionId) &&
+              (get(/databases/$(database)/documents/pretests/$(pretestId)).data.submissionDeadline == null ||
+                request.time <= get(/databases/$(database)/documents/pretests/$(pretestId)).data.submissionDeadline) &&
+              get(/databases/$(database)/documents/pretests/$(pretestId)/participants/$(incoming().participantId)).data.status == 'APPROVED' &&
+              hashing.sha256(incoming().authProof).toHexString().lower() ==
+                get(/databases/$(database)/documents/pretests/$(pretestId)/participant_credentials/$(incoming().participantId)).data.proofHash.lower() &&
+              existsAfter(/databases/$(database)/documents/pretests/$(pretestId)/submission_receipts/$(submissionId))
+            )
+          );
+        allow update, delete: if isLecturer() && isValidId(pretestId) && isValidId(submissionId);
+      }
+
+      // Pre-Test Submission Receipts (Non-sensitive receipt for reconnect & completion count)
+      match /submission_receipts/{submissionId} {
+        allow get: if isValidId(pretestId) && isValidId(submissionId);
+        allow list: if resource.data.questionId is string;
+        allow create: if isValidId(pretestId) && isValidId(submissionId) && isValidPretestSubmissionReceipt(incoming()) &&
+          incoming().submissionId == submissionId &&
+          incoming().submittedAt == request.time && (
+            isLecturer() || existsAfter(/databases/$(database)/documents/pretests/$(pretestId)/submissions/$(submissionId))
+          );
+        allow update, delete: if isLecturer() && isValidId(pretestId) && isValidId(submissionId);
+      }
+
+      // Pre-Test Results (Private scores & ranking, Admin only)
+      match /results/{participantId} {
+        allow get: if isLecturer() && isValidId(pretestId) && isValidId(participantId);
+        allow list: if isLecturer() && resource.data.participantId is string;
+        allow create, update: if isLecturer() && isValidId(pretestId) && isValidId(participantId) &&
+          isValidPretestResult(incoming()) &&
+          incoming().participantId == participantId &&
+          incoming().updatedAt == request.time;
+        allow delete: if isLecturer() && isValidId(pretestId) && isValidId(participantId);
+      }
+
+      // Pre-Test Admin State (Private proposed captains & balance diagnostics, Admin only)
+      match /admin_state/{docId} {
+        allow get: if isLecturer() && isValidId(pretestId) && isValidId(docId);
+        allow list: if isLecturer() && resource.data.docId is string;
+        allow create, update: if isLecturer() && isValidId(pretestId) && isValidId(docId) &&
+          isValidPretestAdminSummary(incoming()) &&
+          incoming().docId == docId &&
+          incoming().updatedAt == request.time;
+        allow delete: if isLecturer() && isValidId(pretestId) && isValidId(docId);
+      }
+    }
+  }
+}

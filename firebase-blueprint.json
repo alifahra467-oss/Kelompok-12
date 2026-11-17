@@ -1,0 +1,560 @@
+{
+  "entities": {
+    "Course": {
+      "title": "Course",
+      "description": "Single university course configuration managed by the lecturer.",
+      "type": "object",
+      "properties": {
+        "courseId": { "type": "string", "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "title": { "type": "string", "minLength": 2, "maxLength": 160 },
+        "description": { "type": "string", "maxLength": 1500 },
+        "lecturerName": { "type": "string", "minLength": 2, "maxLength": 120 },
+        "semester": { "type": "string", "maxLength": 60 },
+        "logoUrl": { "type": "string", "maxLength": 500 },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["courseId", "title", "lecturerName", "semester", "updatedAt"]
+    },
+    "ApprovedLecturer": {
+      "title": "ApprovedLecturer",
+      "description": "Approved lecturer accounts authorized to administer the course.",
+      "type": "object",
+      "properties": {
+        "email": { "type": "string", "maxLength": 120 },
+        "name": { "type": "string", "maxLength": 120 },
+        "addedBy": { "type": "string", "maxLength": 120 },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["email", "createdAt"]
+    },
+    "Topic": {
+      "title": "Topic",
+      "description": "Course topic and subtopics.",
+      "type": "object",
+      "properties": {
+        "topicId": { "type": "string", "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "name": { "type": "string", "minLength": 1, "maxLength": 120 },
+        "description": { "type": "string", "maxLength": 500 },
+        "subtopics": { "type": "array" },
+        "orderIndex": { "type": "number" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["topicId", "name", "subtopics", "orderIndex", "updatedAt"]
+    },
+    "QuestionPrivate": {
+      "title": "QuestionPrivate",
+      "description": "Private question bank entry containing answer keys and unpublished explanations.",
+      "type": "object",
+      "properties": {
+        "questionId": { "type": "string", "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "topicId": { "type": "string", "maxLength": 128 },
+        "topicName": { "type": "string", "maxLength": 120 },
+        "subtopic": { "type": "string", "maxLength": 120 },
+        "type": { "type": "string", "enum": ["MULTIPLE_CHOICE", "TRUE_FALSE", "SHORT_ANSWER", "ESSAY_CASE"] },
+        "questionText": { "type": "string", "minLength": 1, "maxLength": 5000 },
+        "options": { "type": "array" },
+        "correctAnswer": { "type": "string", "maxLength": 2000 },
+        "explanation": { "type": "string", "maxLength": 5000 },
+        "reference": { "type": "string", "maxLength": 500 },
+        "difficulty": { "type": "string", "enum": ["MUDAH", "SEDANG", "SULIT"] },
+        "points": { "type": "number" },
+        "timeLimitSec": { "type": "number" },
+        "enabledModes": { "type": "array" },
+        "imageUrl": { "type": "string", "maxLength": 1000 },
+        "referenceRequirement": { "type": "string", "maxLength": 500 },
+        "isActive": { "type": "boolean" },
+        "isDemo": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["questionId", "topicName", "type", "questionText", "correctAnswer", "difficulty", "points", "timeLimitSec", "enabledModes", "isActive", "createdAt", "updatedAt"]
+    },
+    "Session": {
+      "title": "Session",
+      "description": "Live quiz competition session public state (never stores unpublished answer keys).",
+      "type": "object",
+      "properties": {
+        "sessionId": { "type": "string", "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "title": { "type": "string", "minLength": 2, "maxLength": 160 },
+        "meetingLabel": { "type": "string", "maxLength": 120 },
+        "gameMode": { "type": "string", "enum": ["CERDAS_CERMAT", "PAPAN_TANTANGAN", "TANTANGAN_ANALISIS"] },
+        "status": { "type": "string", "enum": ["DRAFT", "LOBBY", "ACTIVE", "PAUSED", "REVIEWING", "FINISHED"] },
+        "joinCode": { "type": "string", "minLength": 6, "maxLength": 6, "pattern": "^[0-9]{6}$" },
+        "requireJoinApproval": { "type": "boolean" },
+        "isJoinLocked": { "type": "boolean" },
+        "submissionMode": { "type": "string", "enum": ["CAPTAIN_ONLY", "INDIVIDUAL", "TEAM_CONSENSUS"] },
+        "cerdasCermatRound": { "type": "string", "enum": ["WAJIB", "LEMPARAN", "REBUTAN"] },
+        "activeQuestionId": { "type": "string", "maxLength": 128 },
+        "activeQuestionNumber": { "type": "number" },
+        "activeTeamId": { "type": "string", "maxLength": 128 },
+        "authorizedTeamId": { "type": "string", "maxLength": 128 },
+        "buzzerOpen": { "type": "boolean" },
+        "buzzerAttempt": { "type": "number" },
+        "buzzerWinnerTeamId": { "type": "string", "maxLength": 128 },
+        "buzzerWinnerTeamName": { "type": "string", "maxLength": 80 },
+        "buzzerWinnerParticipantName": { "type": "string", "maxLength": 60 },
+        "submissionsOpen": { "type": "boolean" },
+        "timerRunning": { "type": "boolean" },
+        "timerDurationSec": { "type": "number" },
+        "timerRemainingSec": { "type": "number" },
+        "timerEndTimeMs": { "type": "number" },
+        "submissionDeadline": { "type": "string", "format": "date-time" },
+        "answerRevealed": { "type": "boolean" },
+        "revealedAnswer": { "type": "string", "maxLength": 2000 },
+        "explanationRevealed": { "type": "boolean" },
+        "revealedExplanation": { "type": "string", "maxLength": 5000 },
+        "revealedReference": { "type": "string", "maxLength": 500 },
+        "statsReleased": { "type": "boolean" },
+        "questionStats": { "type": "object" },
+        "scoringConfig": { "type": "object" },
+        "boardConfig": { "type": "object" },
+        "createdByUid": { "type": "string", "maxLength": 128 },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["sessionId", "title", "gameMode", "status", "joinCode", "requireJoinApproval", "isJoinLocked", "submissionMode", "buzzerOpen", "buzzerAttempt", "submissionsOpen", "timerRunning", "answerRevealed", "explanationRevealed", "statsReleased", "createdByUid", "createdAt", "updatedAt"]
+    },
+    "PublicQuestion": {
+      "title": "PublicQuestion",
+      "description": "Released question visible on projector and student devices without answer keys.",
+      "type": "object",
+      "properties": {
+        "questionId": { "type": "string", "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "topicName": { "type": "string", "maxLength": 120 },
+        "subtopic": { "type": "string", "maxLength": 120 },
+        "type": { "type": "string", "enum": ["MULTIPLE_CHOICE", "TRUE_FALSE", "SHORT_ANSWER", "ESSAY_CASE"] },
+        "questionText": { "type": "string", "maxLength": 5000 },
+        "options": { "type": "array" },
+        "difficulty": { "type": "string", "enum": ["MUDAH", "SEDANG", "SULIT"] },
+        "points": { "type": "number" },
+        "timeLimitSec": { "type": "number" },
+        "imageUrl": { "type": "string", "maxLength": 1000 },
+        "referenceRequirement": { "type": "string", "maxLength": 500 },
+        "releasedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["questionId", "topicName", "type", "questionText", "points", "timeLimitSec", "releasedAt"]
+    },
+    "Team": {
+      "title": "Team",
+      "description": "Participating team in a quiz session.",
+      "type": "object",
+      "properties": {
+        "teamId": { "type": "string", "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "name": { "type": "string", "minLength": 1, "maxLength": 80 },
+        "color": { "type": "string", "maxLength": 20 },
+        "score": { "type": "number" },
+        "captainParticipantId": { "type": "string", "maxLength": 128 },
+        "captainName": { "type": "string", "maxLength": 60 },
+        "orderIndex": { "type": "number" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["teamId", "name", "color", "score", "orderIndex", "updatedAt"]
+    },
+    "Participant": {
+      "title": "Participant",
+      "description": "Student participant registered in a session.",
+      "type": "object",
+      "properties": {
+        "participantId": { "type": "string", "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "displayName": { "type": "string", "minLength": 2, "maxLength": 60 },
+        "teamId": { "type": "string", "maxLength": 128 },
+        "status": { "type": "string", "enum": ["PENDING", "APPROVED", "REJECTED", "REMOVED"] },
+        "isCaptain": { "type": "boolean" },
+        "isConnected": { "type": "boolean" },
+        "joinedAt": { "type": "string", "format": "date-time" },
+        "lastSeenAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["participantId", "displayName", "teamId", "status", "isCaptain", "isConnected", "joinedAt", "lastSeenAt"]
+    },
+    "ParticipantCredential": {
+      "title": "ParticipantCredential",
+      "description": "Private SHA-256 proof hash for student session verification.",
+      "type": "object",
+      "properties": {
+        "participantId": { "type": "string", "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "proofHash": { "type": "string", "minLength": 64, "maxLength": 64 },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["participantId", "proofHash", "createdAt"]
+    },
+    "Submission": {
+      "title": "Submission",
+      "description": "Private student answer submission readable only by the lecturer.",
+      "type": "object",
+      "properties": {
+        "submissionId": { "type": "string", "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "questionId": { "type": "string", "maxLength": 128 },
+        "questionRoundKey": { "type": "string", "maxLength": 128 },
+        "teamId": { "type": "string", "maxLength": 128 },
+        "teamName": { "type": "string", "maxLength": 80 },
+        "participantId": { "type": "string", "maxLength": 128 },
+        "participantName": { "type": "string", "maxLength": 60 },
+        "authProof": { "type": "string", "maxLength": 256 },
+        "selectedOption": { "type": "string", "maxLength": 1000 },
+        "answerText": { "type": "string", "maxLength": 5000 },
+        "argumentText": { "type": "string", "maxLength": 5000 },
+        "referenceText": { "type": "string", "maxLength": 1000 },
+        "isGraded": { "type": "boolean" },
+        "isCorrect": { "type": "boolean" },
+        "awardedPoints": { "type": "number" },
+        "rubricScores": { "type": "object" },
+        "lecturerFeedback": { "type": "string", "maxLength": 1500 },
+        "approvedForProjector": { "type": "boolean" },
+        "submittedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["submissionId", "questionId", "questionRoundKey", "teamId", "teamName", "participantId", "participantName", "authProof", "isGraded", "awardedPoints", "approvedForProjector", "submittedAt"]
+    },
+    "SubmissionReceipt": {
+      "title": "SubmissionReceipt",
+      "description": "Non-sensitive submission progress receipt visible to projector and participants.",
+      "type": "object",
+      "properties": {
+        "submissionId": { "type": "string", "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "questionRoundKey": { "type": "string", "maxLength": 128 },
+        "questionId": { "type": "string", "maxLength": 128 },
+        "teamId": { "type": "string", "maxLength": 128 },
+        "teamName": { "type": "string", "maxLength": 80 },
+        "participantId": { "type": "string", "maxLength": 128 },
+        "participantName": { "type": "string", "maxLength": 60 },
+        "status": { "type": "string", "enum": ["SUBMITTED", "GRADED"] },
+        "isCorrect": { "type": "boolean" },
+        "awardedPoints": { "type": "number" },
+        "submittedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["submissionId", "questionRoundKey", "questionId", "teamId", "teamName", "participantId", "participantName", "status", "awardedPoints", "submittedAt"]
+    },
+    "PublicResponse": {
+      "title": "PublicResponse",
+      "description": "Lecturer-approved anonymous written response displayed on the projector.",
+      "type": "object",
+      "properties": {
+        "responseId": { "type": "string", "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "questionId": { "type": "string", "maxLength": 128 },
+        "questionRoundKey": { "type": "string", "maxLength": 128 },
+        "anonymousLabel": { "type": "string", "maxLength": 80 },
+        "answerText": { "type": "string", "maxLength": 5000 },
+        "argumentText": { "type": "string", "maxLength": 5000 },
+        "referenceText": { "type": "string", "maxLength": 1000 },
+        "awardedPoints": { "type": "number" },
+        "approvedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["responseId", "questionId", "questionRoundKey", "anonymousLabel", "answerText", "awardedPoints", "approvedAt"]
+    },
+    "BuzzerClaim": {
+      "title": "BuzzerClaim",
+      "description": "Atomic server-ordered buzzer claim lock document.",
+      "type": "object",
+      "properties": {
+        "claimId": { "type": "string", "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "questionId": { "type": "string", "maxLength": 128 },
+        "attempt": { "type": "number" },
+        "teamId": { "type": "string", "maxLength": 128 },
+        "teamName": { "type": "string", "maxLength": 80 },
+        "teamColor": { "type": "string", "maxLength": 20 },
+        "participantId": { "type": "string", "maxLength": 128 },
+        "participantName": { "type": "string", "maxLength": 60 },
+        "claimedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["claimId", "questionId", "attempt", "teamId", "teamName", "teamColor", "participantId", "participantName", "claimedAt"]
+    },
+    "BuzzerProof": {
+      "title": "BuzzerProof",
+      "description": "Private participant token proof paired atomically with BuzzerClaim.",
+      "type": "object",
+      "properties": {
+        "claimId": { "type": "string", "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "participantId": { "type": "string", "maxLength": 128 },
+        "teamId": { "type": "string", "maxLength": 128 },
+        "authProof": { "type": "string", "maxLength": 256 },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["claimId", "participantId", "teamId", "authProof", "createdAt"]
+    },
+    "BuzzerEvent": {
+      "title": "BuzzerEvent",
+      "description": "Audit log of buzzer wins, rejections, and reopens.",
+      "type": "object",
+      "properties": {
+        "eventId": { "type": "string", "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "questionId": { "type": "string", "maxLength": 128 },
+        "attempt": { "type": "number" },
+        "teamId": { "type": "string", "maxLength": 128 },
+        "teamName": { "type": "string", "maxLength": 80 },
+        "participantId": { "type": "string", "maxLength": 128 },
+        "participantName": { "type": "string", "maxLength": 60 },
+        "status": { "type": "string", "enum": ["WON", "REJECTED", "REOPENED"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["eventId", "questionId", "attempt", "status", "createdAt"]
+    },
+    "ScoreEvent": {
+      "title": "ScoreEvent",
+      "description": "Score ledger supporting audit history and undo operations.",
+      "type": "object",
+      "properties": {
+        "eventId": { "type": "string", "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "teamId": { "type": "string", "maxLength": 128 },
+        "teamName": { "type": "string", "maxLength": 80 },
+        "questionId": { "type": "string", "maxLength": 128 },
+        "submissionId": { "type": "string", "maxLength": 128 },
+        "delta": { "type": "number" },
+        "previousScore": { "type": "number" },
+        "newScore": { "type": "number" },
+        "reason": { "type": "string", "maxLength": 300 },
+        "type": { "type": "string", "enum": ["AWARD", "PENALTY", "MANUAL_ADJUST", "RUBRIC_GRADE", "UNDO"] },
+        "undone": { "type": "boolean" },
+        "undoneByEventId": { "type": "string", "maxLength": 128 },
+        "createdByUid": { "type": "string", "maxLength": 128 },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["eventId", "teamId", "teamName", "delta", "previousScore", "newScore", "reason", "type", "undone", "createdByUid", "createdAt"]
+    },
+    "Pretest": {
+      "title": "Pretest",
+      "description": "Smart Pre-Test and Balanced Team Spinner configuration and public state.",
+      "type": "object",
+      "properties": {
+        "pretestId": { "type": "string", "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "title": { "type": "string", "minLength": 2, "maxLength": 160 },
+        "meetingLabel": { "type": "string", "maxLength": 120 },
+        "joinCode": { "type": "string", "minLength": 6, "maxLength": 6, "pattern": "^[0-9]{6}$" },
+        "status": { "type": "string", "enum": ["DRAFT", "LOBBY", "ACTIVE", "PAUSED", "FINISHED"] },
+        "useWeightedPoints": { "type": "boolean" },
+        "releaseAllQuestions": { "type": "boolean" },
+        "activeQuestionId": { "type": "string", "maxLength": 128 },
+        "timerRunning": { "type": "boolean" },
+        "timerDurationSec": { "type": "number" },
+        "timerRemainingSec": { "type": "number" },
+        "timerEndTimeMs": { "type": "number" },
+        "submissionDeadline": { "type": "string", "format": "date-time" },
+        "teamCount": { "type": "number" },
+        "captainsLocked": { "type": "boolean" },
+        "teamsLocked": { "type": "boolean" },
+        "teamsPublished": { "type": "boolean" },
+        "showResultsToStudents": { "type": "boolean" },
+        "allocation": { "type": "object" },
+        "linkedSessionId": { "type": "string", "maxLength": 128 },
+        "linkedGameMode": { "type": "string", "enum": ["CERDAS_CERMAT", "PAPAN_TANTANGAN", "TANTANGAN_ANALISIS"] },
+        "createdByUid": { "type": "string", "maxLength": 128 },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["pretestId", "title", "joinCode", "status", "useWeightedPoints", "releaseAllQuestions", "timerRunning", "teamCount", "captainsLocked", "teamsLocked", "teamsPublished", "showResultsToStudents", "createdByUid", "createdAt", "updatedAt"]
+    },
+    "PretestQuestionPrivate": {
+      "title": "PretestQuestionPrivate",
+      "description": "Private pre-test question with answer key and optional explanation.",
+      "type": "object",
+      "properties": {
+        "questionId": { "type": "string", "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "questionText": { "type": "string", "minLength": 1, "maxLength": 5000 },
+        "options": { "type": "array" },
+        "correctAnswer": { "type": "string", "maxLength": 2000 },
+        "explanation": { "type": "string", "maxLength": 5000 },
+        "timeLimitSec": { "type": "number" },
+        "orderIndex": { "type": "number" },
+        "points": { "type": "number" },
+        "isTieBreak": { "type": "boolean" },
+        "releasedToProjector": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["questionId", "questionText", "options", "correctAnswer", "timeLimitSec", "orderIndex", "points", "isTieBreak", "releasedToProjector", "createdAt", "updatedAt"]
+    },
+    "PretestQuestionPublic": {
+      "title": "PretestQuestionPublic",
+      "description": "Sanitized pre-test question released to students and projector without answer keys.",
+      "type": "object",
+      "properties": {
+        "questionId": { "type": "string", "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "questionText": { "type": "string", "maxLength": 5000 },
+        "options": { "type": "array" },
+        "timeLimitSec": { "type": "number" },
+        "orderIndex": { "type": "number" },
+        "points": { "type": "number" },
+        "isTieBreak": { "type": "boolean" },
+        "answerRevealed": { "type": "boolean" },
+        "revealedAnswer": { "type": "string", "maxLength": 2000 },
+        "revealedExplanation": { "type": "string", "maxLength": 5000 },
+        "releasedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["questionId", "questionText", "options", "timeLimitSec", "orderIndex", "points", "isTieBreak", "answerRevealed", "releasedAt"]
+    },
+    "PretestParticipant": {
+      "title": "PretestParticipant",
+      "description": "Individual student participant in a pre-test.",
+      "type": "object",
+      "properties": {
+        "participantId": { "type": "string", "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "displayName": { "type": "string", "minLength": 2, "maxLength": 60 },
+        "status": { "type": "string", "enum": ["APPROVED", "REMOVED"] },
+        "isConnected": { "type": "boolean" },
+        "joinedAt": { "type": "string", "format": "date-time" },
+        "lastSeenAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["participantId", "displayName", "status", "isConnected", "joinedAt", "lastSeenAt"]
+    },
+    "PretestSubmission": {
+      "title": "PretestSubmission",
+      "description": "Private student answer submission for a pre-test question.",
+      "type": "object",
+      "properties": {
+        "submissionId": { "type": "string", "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "questionId": { "type": "string", "maxLength": 128 },
+        "participantId": { "type": "string", "maxLength": 128 },
+        "participantName": { "type": "string", "maxLength": 60 },
+        "authProof": { "type": "string", "maxLength": 256 },
+        "selectedOption": { "type": "string", "maxLength": 1000 },
+        "submittedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["submissionId", "questionId", "participantId", "participantName", "authProof", "selectedOption", "submittedAt"]
+    },
+    "PretestSubmissionReceipt": {
+      "title": "PretestSubmissionReceipt",
+      "description": "Non-sensitive receipt proving student submitted an answer for a pre-test question.",
+      "type": "object",
+      "properties": {
+        "submissionId": { "type": "string", "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "questionId": { "type": "string", "maxLength": 128 },
+        "participantId": { "type": "string", "maxLength": 128 },
+        "participantName": { "type": "string", "maxLength": 60 },
+        "submittedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["submissionId", "questionId", "participantId", "participantName", "submittedAt"]
+    },
+    "PretestResult": {
+      "title": "PretestResult",
+      "description": "Private pre-test evaluation and ranking per participant (Admin only).",
+      "type": "object",
+      "properties": {
+        "participantId": { "type": "string", "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "displayName": { "type": "string", "maxLength": 60 },
+        "totalCorrect": { "type": "number" },
+        "weightedScore": { "type": "number" },
+        "maxWeightedScore": { "type": "number" },
+        "totalQuestions": { "type": "number" },
+        "answeredCount": { "type": "number" },
+        "percentage": { "type": "number" },
+        "rank": { "type": "number" },
+        "isTied": { "type": "boolean" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["participantId", "displayName", "totalCorrect", "weightedScore", "maxWeightedScore", "totalQuestions", "answeredCount", "percentage", "rank", "isTied", "updatedAt"]
+    },
+    "PretestAdminSummary": {
+      "title": "PretestAdminSummary",
+      "description": "Private admin diagnostic summary including proposed captains and team balance report.",
+      "type": "object",
+      "properties": {
+        "docId": { "type": "string", "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "proposedCaptains": { "type": "array" },
+        "balanceReport": { "type": "object" },
+        "memberScores": { "type": "object" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["docId", "proposedCaptains", "memberScores", "updatedAt"]
+    }
+  },
+  "firestore": {
+    "/course/{courseId}": {
+      "schema": { "$ref": "#/entities/Course" },
+      "description": "Single course metadata."
+    },
+    "/approved_lecturers/{emailId}": {
+      "schema": { "$ref": "#/entities/ApprovedLecturer" },
+      "description": "Approved lecturer email allowlist."
+    },
+    "/topics/{topicId}": {
+      "schema": { "$ref": "#/entities/Topic" },
+      "description": "Course topics and subtopics."
+    },
+    "/questions_private/{questionId}": {
+      "schema": { "$ref": "#/entities/QuestionPrivate" },
+      "description": "Private question bank with answer keys and explanations."
+    },
+    "/sessions/{sessionId}": {
+      "schema": { "$ref": "#/entities/Session" },
+      "description": "Quiz session public state."
+    },
+    "/sessions/{sessionId}/public_questions/{questionId}": {
+      "schema": { "$ref": "#/entities/PublicQuestion" },
+      "description": "Sanitized questions released to projector and students."
+    },
+    "/sessions/{sessionId}/teams/{teamId}": {
+      "schema": { "$ref": "#/entities/Team" },
+      "description": "Teams competing in a session."
+    },
+    "/sessions/{sessionId}/participants/{participantId}": {
+      "schema": { "$ref": "#/entities/Participant" },
+      "description": "Students joined to a session."
+    },
+    "/sessions/{sessionId}/participant_credentials/{participantId}": {
+      "schema": { "$ref": "#/entities/ParticipantCredential" },
+      "description": "Private student token SHA-256 hashes."
+    },
+    "/sessions/{sessionId}/submissions/{submissionId}": {
+      "schema": { "$ref": "#/entities/Submission" },
+      "description": "Private student answer submissions."
+    },
+    "/sessions/{sessionId}/submission_receipts/{submissionId}": {
+      "schema": { "$ref": "#/entities/SubmissionReceipt" },
+      "description": "Non-sensitive submission progress receipts."
+    },
+    "/sessions/{sessionId}/public_responses/{responseId}": {
+      "schema": { "$ref": "#/entities/PublicResponse" },
+      "description": "Approved anonymous responses for projector display."
+    },
+    "/sessions/{sessionId}/buzzer_claims/{claimId}": {
+      "schema": { "$ref": "#/entities/BuzzerClaim" },
+      "description": "Atomic buzzer winner claim lock."
+    },
+    "/sessions/{sessionId}/buzzer_proofs/{claimId}": {
+      "schema": { "$ref": "#/entities/BuzzerProof" },
+      "description": "Private participant credential proof for buzzer claim."
+    },
+    "/sessions/{sessionId}/buzzer_events/{eventId}": {
+      "schema": { "$ref": "#/entities/BuzzerEvent" },
+      "description": "Audit log of buzzer events."
+    },
+    "/sessions/{sessionId}/score_events/{eventId}": {
+      "schema": { "$ref": "#/entities/ScoreEvent" },
+      "description": "Immutable score ledger with undo tracking."
+    },
+    "/pretests/{pretestId}": {
+      "schema": { "$ref": "#/entities/Pretest" },
+      "description": "Smart Pre-Test and Balanced Team Spinner public state."
+    },
+    "/pretests/{pretestId}/questions_private/{questionId}": {
+      "schema": { "$ref": "#/entities/PretestQuestionPrivate" },
+      "description": "Private pre-test questions and answer keys."
+    },
+    "/pretests/{pretestId}/questions_public/{questionId}": {
+      "schema": { "$ref": "#/entities/PretestQuestionPublic" },
+      "description": "Sanitized pre-test questions released to students and projector."
+    },
+    "/pretests/{pretestId}/participants/{participantId}": {
+      "schema": { "$ref": "#/entities/PretestParticipant" },
+      "description": "Students registered in the pre-test."
+    },
+    "/pretests/{pretestId}/participant_credentials/{participantId}": {
+      "schema": { "$ref": "#/entities/ParticipantCredential" },
+      "description": "Private student token SHA-256 hashes for pre-test."
+    },
+    "/pretests/{pretestId}/submissions/{submissionId}": {
+      "schema": { "$ref": "#/entities/PretestSubmission" },
+      "description": "Private student answer submissions for pre-test."
+    },
+    "/pretests/{pretestId}/submission_receipts/{submissionId}": {
+      "schema": { "$ref": "#/entities/PretestSubmissionReceipt" },
+      "description": "Non-sensitive pre-test submission progress receipts."
+    },
+    "/pretests/{pretestId}/results/{participantId}": {
+      "schema": { "$ref": "#/entities/PretestResult" },
+      "description": "Private pre-test evaluation results (Admin only)."
+    },
+    "/pretests/{pretestId}/admin_state/{docId}": {
+      "schema": { "$ref": "#/entities/PretestAdminSummary" },
+      "description": "Private admin diagnostic summary and balance report."
+    }
+  }
+}
