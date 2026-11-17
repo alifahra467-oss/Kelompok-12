@@ -15,32 +15,32 @@ export const ULUMUL_QURAN_TOPICS: Topic[] = [
     topicId: 'topic_uq_asbab',
     name: 'Asbabun Nuzul',
     description:
-      'Pengertian, syarat masa turunnya wahyu, pedoman riwayat shahih, kaidah Al-‘Ibrah bi ‘Umumil Lafzhi, serta redaksi shighat dan berbilangnya riwayat.',
-    subtopics: ['Definisi & Batasan Zaman', 'Pedoman Riwayat', 'Kaidah Umum Lafaz', 'Redaksi Shighat'],
+      'Pengertian, syarat masa turunnya wahyu, pedoman riwayat shahih, kaidah umum lafaz, serta redaksi riwayat.',
+    subtopics: ['Definisi & Batasan Waktu', 'Pedoman Riwayat', 'Kaidah Umum Lafaz', 'Redaksi Riwayat'],
     orderIndex: 1,
   },
   {
     topicId: 'topic_uq_nuzul',
     name: 'Turunnya Al-Qur’an',
     description:
-      'Makna Nuzulul Qur’an, dua tahap turunnya Al-Qur’an, perbedaan Inzal dan Tanzil, serta hikmah turun secara berangsur-angsur.',
-    subtopics: ['Tahap Lauhul Mahfuzh & Baitul ‘Izzah', 'Inzal vs Tanzil', 'Hikmah Turun Bertahap', 'Pentahapan Hukum'],
+      'Tahapan turunnya Al-Qur’an, perbedaan Inzal dan Tanzil, serta hikmah turun secara bertahap.',
+    subtopics: ['Lauhul Mahfuzh & Baitul ‘Izzah', 'Inzal vs Tanzil', 'Hikmah Turun Bertahap', 'Pentahapan Hukum'],
     orderIndex: 2,
   },
   {
     topicId: 'topic_uq_jam',
     name: 'Pengumpulan & Penyusunan Al-Qur’an',
     description:
-      'Kodifikasi Al-Qur’an pada masa Nabi SAW, Abu Bakar Ash-Shiddiq, dan Utsman bin Affan, serta sifat penertiban ayat dan surat.',
-    subtopics: ['Masa Abu Bakar & Yamamah', 'Metode Zaid bin Tsabit', 'Mushaf Utsmani', 'Tertib Ayat Tauqifi'],
+      'Pengumpulan Al-Qur’an pada masa Abu Bakar Ash-Shiddiq dan Utsman bin Affan, serta sifat urutan ayat.',
+    subtopics: ['Masa Abu Bakar & Yamamah', 'Syarat Zaid bin Tsabit', 'Mushaf Utsmani', 'Urutan Ayat Tauqifi'],
     orderIndex: 3,
   },
   {
     topicId: 'topic_uq_ahruf',
     name: 'Tujuh Huruf (Sab‘atu Ahruf)',
     description:
-      'Dalil mutawatir turunnya Al-Qur’an dalam tujuh huruf, makna pendapat terkuat, hikmah keringanan, dan perbedaannya dengan Qira’at Sab‘ah.',
-    subtopics: ['Hadis Sab‘atu Ahruf', 'Makna Tujuh Bahasa/Dialek', 'Hikmah Keringanan', 'Tujuh Huruf vs Qira’at Sab‘ah'],
+      'Tujuan keringanan tujuh huruf, pengertian menurut pendapat terkuat, dan perbedaannya dengan Qira’at Sab‘ah.',
+    subtopics: ['Alasan Keringanan', 'Pengertian Tujuh Huruf', 'Tujuh Huruf vs Qira’at Sab‘ah'],
     orderIndex: 4,
   },
 ];
@@ -50,23 +50,22 @@ export const ULUMUL_QURAN_QUESTIONS: Array<Omit<QuestionPrivate, 'createdAt' | '
     questionId: 'uq_q_01',
     topicId: 'topic_uq_asbab',
     topicName: 'Asbabun Nuzul',
-    subtopic: 'Definisi & Batasan Zaman',
+    subtopic: 'Definisi & Batasan Waktu',
     type: 'MULTIPLE_CHOICE',
     questionText:
-      'Berdasarkan definisi Asbabun Nuzul dalam kajian ‘Ulûmul Qur’ân, peristiwa manakah yang TIDAK termasuk Asbabun Nuzul karena tidak memenuhi syarat batasan waktu turunnya wahyu?',
+      'Dari pengertian Asbabun Nuzul, peristiwa manakah yang BUKAN termasuk sebab turunnya ayat yang terjadi sebelum masa kenabian Muhammadﷺ?',
     options: [
-      'Kisah umat terdahulu sebelum masa kenabian Muhammad ﷺ, seperti kisah pasukan bergajah (Ashabul Fil) pada QS. Al-Fil',
-      'Pertanyaan para sahabat kepada Rasulullah ﷺ tentang syariat atau ruh pada masa turunnya wahyu',
-      'Peristiwa perselisihan keluarga atau hukum yang terjadi pada masa kehidupan Nabi Muhammad ﷺ',
-      'Pertanyaan kaum Yahudi atau musyrikin yang diajukan langsung kepada Nabi Muhammad ﷺ ketika Al-Qur’an masih turun',
+      'Kisah pasukan bergajah (Ashabul Fil) dalam QS. Al-Fil',
+      'Pertanyaan para sahabat kepada Nabi ﷺ tentang suatu hukum',
+      'Perselisihan sahabat yang terjadi saat masa turunnya wahyu',
+      'Pertanyaan kaum Yahudi kepada Nabi ﷺ di Madinah',
     ],
-    correctAnswer:
-      'Kisah umat terdahulu sebelum masa kenabian Muhammad ﷺ, seperti kisah pasukan bergajah (Ashabul Fil) pada QS. Al-Fil',
+    correctAnswer: 'Kisah pasukan bergajah (Ashabul Fil) dalam QS. Al-Fil',
     explanation:
-      'Asbabun Nuzul mensyaratkan peristiwa atau pertanyaan yang terjadi pada masa turunnya Al-Qur’an (zaman kenabian Muhammad ﷺ). Imam As-Suyuthi mengkritik Al-Wahidi karena memasukkan kisah Ashabul Fil sebagai sebab turunnya QS. Al-Fil, padahal kejadian itu berlangsung sebelum masa turunnya wahyu dan merupakan bagian dari kisah umat terdahulu.',
+      'Asbabun Nuzul harus berupa peristiwa atau pertanyaan yang terjadi pada masa turunnya Al-Qur’an (zaman kenabian Muhammad ﷺ). Kisah pasukan bergajah terjadi sebelum Nabi ﷺ lahir/diutus, sehingga termasuk kisah umat terdahulu dan bukan Asbabun Nuzul.',
     reference:
       'Manna Al-Qaththan, Pengantar Studi Ilmu Al-Qur’an, Bab 6 (Asbabun Nuzul); H. Sardana, Pondasi Dasar Memahami ‘Ulûmul Qur’ân, Bab VI',
-    difficulty: 'SEDANG',
+    difficulty: 'MUDAH',
     points: 10,
     timeLimitSec: 45,
     enabledModes: ['CERDAS_CERMAT', 'PAPAN_TANTANGAN'],
@@ -80,17 +79,16 @@ export const ULUMUL_QURAN_QUESTIONS: Array<Omit<QuestionPrivate, 'createdAt' | '
     subtopic: 'Pedoman Riwayat',
     type: 'MULTIPLE_CHOICE',
     questionText:
-      'Bagaimanakah pedoman yang disepakati para ulama untuk mengetahui secara sahih Asbabun Nuzul suatu ayat Al-Qur’an?',
+      'Berdasarkan kesepakatan ulama, melalui jalur apakah Asbabun Nuzul dapat diketahui secara sah?',
     options: [
-      'Hanya melalui riwayat yang shahih dari Nabi ﷺ atau sahabat yang menyaksikan langsung sebab dan turunnya ayat',
-      'Melalui analisis kebahasaan dan penalaran akal (ra’yu) mufasir terhadap konteks sosial kontemporer',
-      'Berdasarkan perkiraan logis mufasir muta’akhkhirin tanpa perlu memperhatikan sanad riwayat',
-      'Dengan membandingkan kisah-kisah umat terdahulu sebelum diutusnya Nabi Muhammad ﷺ',
+      'Riwayat shahih dari sahabat yang menyaksikan langsung turunnya ayat',
+      'Ijtihad dan penalaran akal semata tanpa sanad riwayat',
+      'Penyesuaian dengan kondisi sosial masyarakat masa kini',
+      'Perbandingan dengan kisah-kisah umat sebelum Islam',
     ],
-    correctAnswer:
-      'Hanya melalui riwayat yang shahih dari Nabi ﷺ atau sahabat yang menyaksikan langsung sebab dan turunnya ayat',
+    correctAnswer: 'Riwayat shahih dari sahabat yang menyaksikan langsung turunnya ayat',
     explanation:
-      'Para ulama seperti Al-Wahidi menegaskan bahwa mengetahui Asbabun Nuzul tidak boleh ditempuh dengan akal-akalan (ra’yu/ijtihad semata), melainkan hanya berlandaskan riwayat shahih dari sahabat yang menyaksikan langsung peristiwa turunnya ayat.',
+      'Para ulama sepakat bahwa mengetahui Asbabun Nuzul tidak boleh dengan tebakan atau akal semata, tetapi wajib bersumber dari riwayat shahih para sahabat yang menyaksikan langsung peristiwa turunnya ayat.',
     reference:
       'Manna Al-Qaththan, Pengantar Studi Ilmu Al-Qur’an, Bab 6 (Pedoman Mengetahui Asbabun Nuzul); H. Sardana, Bab VI',
     difficulty: 'MUDAH',
@@ -107,17 +105,16 @@ export const ULUMUL_QURAN_QUESTIONS: Array<Omit<QuestionPrivate, 'createdAt' | '
     subtopic: 'Kaidah Umum Lafaz',
     type: 'MULTIPLE_CHOICE',
     questionText:
-      'Apabila suatu ayat turun karena sebab yang khusus sedangkan redaksi lafaz ayat tersebut bersifat umum—seperti ayat Li’an (QS. An-Nur: 6–9) atau Zhihar (QS. Al-Mujadilah: 1)—kaidah manakah yang dipegang oleh jumhur ulama?',
+      'Suatu ayat turun karena kasus khusus, namun redaksi lafaznya bersifat umum. Bagaimana pemberlakuan hukumnya menurut jumhur ulama?',
     options: [
-      'Al-‘ibratu bi ‘umumil lafzhi la bi khushushis sabab (yang menjadi pegangan adalah keumuman lafaz, bukan kekhususan sebab)',
-      'Al-‘ibratu bi khushushis sabab la bi ‘umumil lafzhi (hukum ayat hanya berlaku khusus bagi pelaku peristiwanya saja)',
-      'Hukum ayat otomatis berhenti berlaku setelah sahabat yang menjadi sebab turunnya wafat',
-      'Bentuk sebab asal harus dikeluarkan terlebih dahulu dari cakupan lafaz umum melalui takhshish',
+      'Berlaku umum sesuai keumuman lafaznya (Al-‘ibrah bi ‘umumil lafzhi)',
+      'Hanya berlaku khusus bagi pelaku peristiwa tersebut',
+      'Hukumnya gugur setelah sahabat yang bersangkutan wafat',
+      'Tidak dapat diterapkan pada kasus serupa setelah masa Nabi ﷺ',
     ],
-    correctAnswer:
-      'Al-‘ibratu bi ‘umumil lafzhi la bi khushushis sabab (yang menjadi pegangan adalah keumuman lafaz, bukan kekhususan sebab)',
+    correctAnswer: 'Berlaku umum sesuai keumuman lafaznya (Al-‘ibrah bi ‘umumil lafzhi)',
     explanation:
-      'Jumhur ulama menetapkan kaidah Al-‘ibratu bi ‘umumil lafzhi la bi khushushis sabab, yakni hukum ditetapkan menurut keumuman redaksi ayat, bukan semata kekhususan peristiwa awalnya. Karena itu hukum Li’an (terkait Hilal bin Umayyah) dan Zhihar (terkait Khaulah binti Tsa’labah & Aus bin Ash-Shamit) berlaku umum untuk seluruh umat.',
+      'Mayoritas ulama berpegang pada kaidah Al-‘ibrah bi ‘umumil lafzhi la bi khushushis sabab: yang menjadi patokan hukum adalah keumuman lafaz ayat, bukan kekhususan peristiwanya. Karena itu hukum Li’an dan Zhihar berlaku untuk semua umat Islam.',
     reference:
       'Manna Al-Qaththan, Pengantar Studi Ilmu Al-Qur’an, Bab 6 (Kaidah Al-‘Ibrah); H. Sardana, Bab VI',
     difficulty: 'SEDANG',
@@ -131,23 +128,23 @@ export const ULUMUL_QURAN_QUESTIONS: Array<Omit<QuestionPrivate, 'createdAt' | '
     questionId: 'uq_q_04',
     topicId: 'topic_uq_asbab',
     topicName: 'Asbabun Nuzul',
-    subtopic: 'Redaksi Shighat',
+    subtopic: 'Redaksi Riwayat',
     type: 'MULTIPLE_CHOICE',
     questionText:
-      'Jika terdapat dua riwayat shahih tentang suatu ayat: riwayat pertama memakai redaksi tegas (sharih, seperti "Maka turunlah ayat...") dan riwayat kedua memakai redaksi muhtamilah ("Ayat ini turun mengenai..."), bagaimana cara ulama menyikapinya?',
+      'Bila terdapat dua riwayat shahih: satu memakai redaksi tegas ("Maka turunlah ayat...") dan satu lagi memakai redaksi ("Ayat ini turun mengenai..."), manakah yang ditetapkan sebagai Asbabun Nuzul?',
     options: [
-      'Mengambil riwayat yang berredaksi tegas (sharih) sebagai Asbabun Nuzul, sedangkan redaksi muhtamilah dipahami sebagai penjelasan kandungan makna ayat',
-      'Menolak kedua riwayat tersebut karena dianggap saling bertentangan satu sama lain',
-      'Langsung menyimpulkan bahwa ayat tersebut diturunkan berulang kali tanpa proses tarjih',
-      'Mengutamakan riwayat muhtamilah karena bentuk ungkapannya bersifat penafsiran umum',
+      'Riwayat beredaksi tegas (sharih), sedangkan riwayat kedua dipahami sebagai tafsir makna',
+      'Keduanya ditolak karena dinilai saling bertentangan',
+      'Riwayat kedua didahulukan karena maknanya lebih luas',
+      'Ayat tersebut dihukumi turun berulang kali tanpa perlu tarjih',
     ],
     correctAnswer:
-      'Mengambil riwayat yang berredaksi tegas (sharih) sebagai Asbabun Nuzul, sedangkan redaksi muhtamilah dipahami sebagai penjelasan kandungan makna ayat',
+      'Riwayat beredaksi tegas (sharih), sedangkan riwayat kedua dipahami sebagai tafsir makna',
     explanation:
-      'Redaksi "Nazalat hadzihil ayatu fi kadza" tergolong muhtamilah (mengandung dua kemungkinan: sebab turunnya ayat atau sekadar penjelasan kandungan hukum ayat). Apabila bertemu dengan riwayat shahih yang tegas (sharih), maka riwayat yang tegas itulah yang ditetapkan sebagai Asbabun Nuzul.',
+      'Ungkapan "Ayat ini turun mengenai..." bisa bermakna sebab turunnya ayat atau sekadar penjelasan isi ayat. Karena itu, jika bertemu riwayat shahih yang tegas menyatakan "Maka turunlah ayat...", riwayat tegas itulah yang ditetapkan sebagai Asbabun Nuzul.',
     reference:
-      'Manna Al-Qaththan, Pengantar Studi Ilmu Al-Qur’an, Bab 6 (Redaksi dan Berbilangnya Riwayat Asbabun Nuzul); H. Sardana, Bab VI',
-    difficulty: 'SULIT',
+      'Manna Al-Qaththan, Pengantar Studi Ilmu Al-Qur’an, Bab 6 (Redaksi dan Berbilangnya Riwayat); H. Sardana, Bab VI',
+    difficulty: 'SEDANG',
     points: 10,
     timeLimitSec: 45,
     enabledModes: ['CERDAS_CERMAT', 'PAPAN_TANTANGAN'],
@@ -158,22 +155,22 @@ export const ULUMUL_QURAN_QUESTIONS: Array<Omit<QuestionPrivate, 'createdAt' | '
     questionId: 'uq_q_05',
     topicId: 'topic_uq_nuzul',
     topicName: 'Turunnya Al-Qur’an',
-    subtopic: 'Tahap Lauhul Mahfuzh & Baitul ‘Izzah',
+    subtopic: 'Lauhul Mahfuzh & Baitul ‘Izzah',
     type: 'MULTIPLE_CHOICE',
     questionText:
-      'Menurut mazhab jumhur ulama yang berpegang pada riwayat shahih Ibnu Abbas رضي الله عنهما, bagaimanakah tahapan turunnya Al-Qur’an berlangsung?',
+      'Menurut jumhur ulama berdasarkan riwayat Ibnu Abbas رضي الله عنهما, bagaimana dua tahapan turunnya Al-Qur’an?',
     options: [
-      'Turun sekaligus (jumlatan wahidah) ke Baitul ‘Izzah di langit dunia pada malam Lailatul Qadar, lalu turun berangsur-angsur (munajjaman) kepada Nabi ﷺ selama ±23 tahun',
-      'Turun sekaligus seluruh 30 juz langsung ke hati Nabi Muhammad ﷺ pada tanggal 17 Ramadhan tahun ke-2 Hijriah',
-      'Turun bertahap dari Allah ke Lauhul Mahfuzh pada setiap malam Lailatul Qadar selama 23 tahun tanpa singgah di Baitul ‘Izzah',
-      'Turun sekaligus berbentuk lembaran mushaf tertulis lengkap sebagaimana kitab Taurat Nabi Musa عليه السلام',
+      'Turun sekaligus ke Baitul ‘Izzah pada Lailatul Qadar, lalu bertahap kepada Nabi ﷺ selama ±23 tahun',
+      'Turun sekaligus 30 juz langsung kepada Nabi ﷺ dalam satu malam di Gua Hira',
+      'Turun bertahap ke Lauhul Mahfuzh tanpa pernah singgah di langit dunia',
+      'Turun sekaligus dalam bentuk mushaf tertulis lengkap sebagaimana Taurat',
     ],
     correctAnswer:
-      'Turun sekaligus (jumlatan wahidah) ke Baitul ‘Izzah di langit dunia pada malam Lailatul Qadar, lalu turun berangsur-angsur (munajjaman) kepada Nabi ﷺ selama ±23 tahun',
+      'Turun sekaligus ke Baitul ‘Izzah pada Lailatul Qadar, lalu bertahap kepada Nabi ﷺ selama ±23 tahun',
     explanation:
-      'Pendapat yang paling kuat menurut jumhur ulama memadukan ayat tentang turunnya Al-Qur’an di bulan Ramadhan/Lailatul Qadar dengan kenyataan turunnya bertahap: tahap pertama turun sekaligus dari Lauhul Mahfuzh ke Baitul ‘Izzah (langit dunia) pada Lailatul Qadar, dan tahap kedua turun berangsur-angsur kepada Rasulullah ﷺ melalui Jibril selama 23 tahun (13 tahun di Makkah dan 10 tahun di Madinah).',
+      'Jumhur ulama menjelaskan dua tahap: pertama, Al-Qur’an diturunkan sekaligus dari Lauhul Mahfuzh ke Baitul ‘Izzah (langit dunia) pada malam Lailatul Qadar. Kedua, diturunkan secara berangsur-angsur kepada Nabi Muhammad ﷺ melalui Jibril selama ±23 tahun.',
     reference:
-      'Manna Al-Qaththan, Pengantar Studi Ilmu Al-Qur’an, Bab 7 (Turunnya Al-Qur’an); H. Sardana, Pondasi Dasar Memahami ‘Ulûmul Qur’ân, Bab IV',
+      'Manna Al-Qaththan, Pengantar Studi Ilmu Al-Qur’an, Bab 7 (Turunnya Al-Qur’an); H. Sardana, Bab IV',
     difficulty: 'MUDAH',
     points: 10,
     timeLimitSec: 45,
@@ -188,17 +185,17 @@ export const ULUMUL_QURAN_QUESTIONS: Array<Omit<QuestionPrivate, 'createdAt' | '
     subtopic: 'Inzal vs Tanzil',
     type: 'MULTIPLE_CHOICE',
     questionText:
-      'Mengutip penjelasan Ar-Raghib Al-Ashfahani dalam pembahasan Nuzulul Qur’an, apakah perbedaan nuansa makna antara kata Tanzil (تَنْزِيلٌ) dan Inzal (إِنْزَالٌ)?',
+      'Apa perbedaan makna antara istilah Tanzil (تَنْزِيلٌ) dan Inzal (إِنْزَالٌ) dalam kajian Nuzulul Qur’an?',
     options: [
-      'Tanzil mengandung makna turun secara berangsur-angsur (bertahap), sedangkan Inzal menunjukkan makna turun secara umum (termasuk sekaligus)',
-      'Inzal hanya digunakan untuk ayat-ayat Madaniyah, sedangkan Tanzil khusus bagi ayat-ayat Makkiyah',
-      'Tanzil berarti wahyu melalui mimpi yang benar, sedangkan Inzal berarti wahyu melalui Malaikat Jibril',
-      'Keduanya sama-sama bermakna penurunan kitab suci yang rampung sekaligus dalam satu malam',
+      'Tanzil berarti turun secara bertahap, sedangkan Inzal bermakna turun secara umum (termasuk sekaligus)',
+      'Inzal khusus untuk ayat Madaniyah, sedangkan Tanzil khusus untuk ayat Makkiyah',
+      'Tanzil berarti wahyu melalui mimpi, sedangkan Inzal melalui Malaikat Jibril',
+      'Keduanya sama-sama berarti turun sekaligus dalam bentuk kitab tertulis',
     ],
     correctAnswer:
-      'Tanzil mengandung makna turun secara berangsur-angsur (bertahap), sedangkan Inzal menunjukkan makna turun secara umum (termasuk sekaligus)',
+      'Tanzil berarti turun secara bertahap, sedangkan Inzal bermakna turun secara umum (termasuk sekaligus)',
     explanation:
-      'Ar-Raghib membedakan kedua lafaz tersebut: kata Tanzil menunjukkan proses turun secara bertahap dan berangsur-angsur sedikit demi sedikit, sedangkan kata Inzal memiliki makna turun secara umum baik sekaligus maupun bertahap.',
+      'Menurut Ar-Raghib Al-Ashfahani, kata Tanzil menunjukkan proses turun secara berangsur-angsur dan bertahap, sedangkan Inzal menunjukkan makna turun secara umum, baik sekaligus maupun bertahap.',
     reference: 'Manna Al-Qaththan, Pengantar Studi Ilmu Al-Qur’an, Bab 7 (Perbedaan antara Inzal dan Tanzil)',
     difficulty: 'SEDANG',
     points: 10,
@@ -214,17 +211,16 @@ export const ULUMUL_QURAN_QUESTIONS: Array<Omit<QuestionPrivate, 'createdAt' | '
     subtopic: 'Hikmah Turun Bertahap',
     type: 'MULTIPLE_CHOICE',
     questionText:
-      'Dalam QS. Al-Furqan ayat 32, Allah menjawab pertanyaan kaum kafir mengapa Al-Qur’an tidak diturunkan sekaligus dengan firman-Nya "kadzalika linutsabbita bihi fu’adaka". Hikmah utama yang ditegaskan penggalan ayat ini adalah...',
+      'Berdasarkan QS. Al-Furqan ayat 32, apakah hikmah utama Al-Qur’an diturunkan secara berangsur-angsur?',
     options: [
-      'Untuk meneguhkan dan memantapkan hati Rasulullah ﷺ dalam menghadapi tentangan dakwah',
-      'Untuk mempercepat penulisan mushaf lengkap sebelum periode hijrah ke Madinah',
-      'Untuk menyamakan cara turunnya Al-Qur’an dengan kitab Taurat dan Zabur',
-      'Untuk mengurangi ketergantungan para sahabat terhadap hafalan ayat-ayat panjang',
+      'Meneguhkan hati Rasulullah ﷺ dalam menghadapi tantangan dakwah',
+      'Mempercepat penulisan mushaf sebelum hijrah ke Madinah',
+      'Menyamakan cara turunnya dengan kitab Taurat Nabi Musa',
+      'Mengurangi beban hafalan para sahabat terhadap ayat Al-Qur’an',
     ],
-    correctAnswer:
-      'Untuk meneguhkan dan memantapkan hati Rasulullah ﷺ dalam menghadapi tentangan dakwah',
+    correctAnswer: 'Meneguhkan hati Rasulullah ﷺ dalam menghadapi tantangan dakwah',
     explanation:
-      'Hikmah pertama yang disebutkan langsung dalam QS. Al-Furqan: 32 adalah meneguhkan hati Rasulullah ﷺ (tatsbitu fu’adin Nabi) setiap kali menghadapi tekanan kaum musyrikin, di samping hikmah menjawab tantangan musyrik, memudahkan hafalan umat yang ummi, serta pentahapan hukum.',
+      'Dalam QS. Al-Furqan: 32 ("kadzalika linutsabbita bihi fu’adaka"), hikmah utama turunnya Al-Qur’an secara bertahap adalah menguatkan dan memantapkan hati Nabi ﷺ ketika menghadapi penentangan kaum musyrikin, sekaligus memudahkan umat menghafal dan memahaminya.',
     reference:
       'Manna Al-Qaththan, Pengantar Studi Ilmu Al-Qur’an, Bab 7 (Hikmah Turunnya Al-Qur’an Secara Bertahap); H. Sardana, Bab IV',
     difficulty: 'MUDAH',
@@ -241,17 +237,16 @@ export const ULUMUL_QURAN_QUESTIONS: Array<Omit<QuestionPrivate, 'createdAt' | '
     subtopic: 'Pentahapan Hukum',
     type: 'MULTIPLE_CHOICE',
     questionText:
-      'Contoh paling jelas dari hikmah turunnya Al-Qur’an secara bertahap dalam menerapkan pentahapan hukum (tadarruj fit tasyri’) adalah syariat mengenai...',
+      'Manakah contoh syariat yang paling jelas menggambarkan pentahapan hukum (tadarruj) dalam turunnya Al-Qur’an?',
     options: [
-      'Pengharaman minuman keras (khamr) yang diturunkan secara bertahap melalui empat rangkaian ayat hingga diharamkan secara mutlak',
-      'Kewajiban shalat lima waktu yang diturunkan dalam empat tahap terpisah di Madinah',
-      'Larangan transaksi riba yang langsung diharamkan secara penuh pada wahyu pertama di Gua Hira',
-      'Perintah pemindahan arah kiblat dari Baitul Maqdis ke Ka’bah melalui empat surat Makkiyah',
+      'Pengharaman khamr yang ditetapkan bertahap melalui empat rangkaian ayat',
+      'Kewajiban shalat lima waktu yang diturunkan dalam empat tahap terpisah',
+      'Larangan riba yang langsung diharamkan mutlak pada wahyu pertama',
+      'Pemindahan arah kiblat ke Ka’bah yang turun bertahap dalam empat surat',
     ],
-    correctAnswer:
-      'Pengharaman minuman keras (khamr) yang diturunkan secara bertahap melalui empat rangkaian ayat hingga diharamkan secara mutlak',
+    correctAnswer: 'Pengharaman khamr yang ditetapkan bertahap melalui empat rangkaian ayat',
     explanation:
-      'Kebiasaan minum khamr yang mengakar di masyarakat Arab tidak dihapus secara mendadak, melainkan melalui empat tahap ayat: QS. An-Nahl: 67 (isyarat perbedaan rezeki baik dan memabukkan), QS. Al-Baqarah: 219 (dosanya lebih besar daripada manfaatnya), QS. An-Nisa’: 43 (larangan shalat dalam keadaan mabuk), hingga QS. Al-Ma’idah: 90–91 (pengharaman tegas).',
+      'Kebiasaan minum khamr sangat melekat di masyarakat Arab kala itu, sehingga Allah mengharamkannya dalam empat tahap: QS. An-Nahl: 67, QS. Al-Baqarah: 219, QS. An-Nisa’: 43, hingga pengharaman tegas pada QS. Al-Ma’idah: 90–91.',
     reference:
       'Manna Al-Qaththan, Pengantar Studi Ilmu Al-Qur’an, Bab 7 (Sejalan dengan Peristiwa dan Pentahapan Hukum)',
     difficulty: 'MUDAH',
@@ -268,17 +263,16 @@ export const ULUMUL_QURAN_QUESTIONS: Array<Omit<QuestionPrivate, 'createdAt' | '
     subtopic: 'Masa Abu Bakar & Yamamah',
     type: 'MULTIPLE_CHOICE',
     questionText:
-      'Peristiwa genting apakah yang melatarbelakangi Umar bin Al-Khaththab mengusulkan pengumpulan Al-Qur’an kepada Khalifah Abu Bakar Ash-Shiddiq?',
+      'Peristiwa apakah yang melatarbelakangi usulan Umar bin Khaththab kepada Khalifah Abu Bakar untuk mengumpulkan Al-Qur’an?',
     options: [
-      'Gugurnya sekitar 70 sahabat penghafal Al-Qur’an (qurra’) dalam Perang Yamamah melawan Musailamah Al-Kadzdzab',
-      'Pertikaian bacaan antara pasukan Syam dan Irak saat ekspedisi ke Armenia dan Azerbaijan',
-      'Rusaknya seluruh catatan wahyu pada pelepah kurma yang disimpan di rumah Hafshah binti Umar',
-      'Banyaknya masyarakat non-Arab yang belum dapat membaca tulisan Arab gundul',
+      'Gugurnya sekitar 70 sahabat penghafal Al-Qur’an dalam Perang Yamamah',
+      'Perselisihan bacaan antara pasukan Syam dan Irak di front Armenia',
+      'Hilangnya catatan wahyu yang disimpan di rumah Hafshah binti Umar',
+      'Banyaknya mualaf non-Arab yang kesulitan membaca tulisan tanpa tanda titik',
     ],
-    correctAnswer:
-      'Gugurnya sekitar 70 sahabat penghafal Al-Qur’an (qurra’) dalam Perang Yamamah melawan Musailamah Al-Kadzdzab',
+    correctAnswer: 'Gugurnya sekitar 70 sahabat penghafal Al-Qur’an dalam Perang Yamamah',
     explanation:
-      'Pada Perang Yamamah tahun 12 H melawan Musailamah Al-Kadzdzab, gugur sekitar 70 sahabat penghafal Al-Qur’an. Khawatir Al-Qur’an akan banyak hilang seiring wafatnya para qurra’, Umar mengusulkan kepada Abu Bakar agar seluruh ayat Al-Qur’an dihimpun dalam satu mushaf, yang kemudian diamanahkan kepada Zaid bin Tsabit.',
+      'Pada Perang Yamamah (12 H), sekitar 70 sahabat penghafal Al-Qur’an (qurra’) gugur syahid. Umar khawatir Al-Qur’an akan banyak hilang jika para penghafalnya wafat, sehingga ia mengusulkan kepada Abu Bakar untuk menghimpunnya, dan tugas itu diberikan kepada Zaid bin Tsabit.',
     reference:
       'Manna Al-Qaththan, Pengantar Studi Ilmu Al-Qur’an, Bab 8 (Pengumpulan Al-Qur’an Masa Abu Bakar); H. Sardana, Bab V',
     difficulty: 'MUDAH',
@@ -292,23 +286,22 @@ export const ULUMUL_QURAN_QUESTIONS: Array<Omit<QuestionPrivate, 'createdAt' | '
     questionId: 'uq_q_10',
     topicId: 'topic_uq_jam',
     topicName: 'Pengumpulan & Penyusunan Al-Qur’an',
-    subtopic: 'Metode Zaid bin Tsabit',
+    subtopic: 'Syarat Zaid bin Tsabit',
     type: 'MULTIPLE_CHOICE',
     questionText:
-      'Dalam proyek pengumpulan Al-Qur’an pada masa Abu Bakar, Zaid bin Tsabit menerapkan kehati-hatian sangat tinggi: ia tidak hanya menerima hafalan semata, melainkan mensyaratkan bukti hafalan dan catatan tertulis yang dikuatkan oleh...',
+      'Dalam penghimpunan Al-Qur’an masa Abu Bakar, selain hafalan, syarat mutlak apa yang ditetapkan Zaid bin Tsabit untuk menerima catatan ayat?',
     options: [
-      'Dua orang saksi bahwa tulisan ayat tersebut benar-benar ditulis di hadapan Rasulullah ﷺ',
-      'Persetujuan sepuluh orang pemimpin kabilah dari wilayah Hijaz dan Yaman',
-      'Satu orang saksi dari generasi tabi’in yang berdomisili di kota Madinah',
-      'Catatan pribadi penulis tanpa perlu verifikasi kesaksian sahabat lain',
+      'Didukung dua orang saksi bahwa ayat itu ditulis langsung di hadapan Nabi ﷺ',
+      'Disetujui oleh sepuluh kepala suku di Madinah dan Makkah',
+      'Disaksikan oleh satu orang tabi’in yang bermukim di Madinah',
+      'Berdasarkan catatan pribadi penulis tanpa perlu kesaksian sahabat lain',
     ],
-    correctAnswer:
-      'Dua orang saksi bahwa tulisan ayat tersebut benar-benar ditulis di hadapan Rasulullah ﷺ',
+    correctAnswer: 'Didukung dua orang saksi bahwa ayat itu ditulis langsung di hadapan Nabi ﷺ',
     explanation:
-      'Zaid bin Tsabit tidak mencukupkan diri dengan hafalannya sendiri atau catatan tanpa saksi; setiap ayat harus memenuhi hafalan sahabat serta catatan tertulis yang disaksikan oleh dua orang saksi bahwa naskah itu ditulis di hadapan Nabi ﷺ (kecuali dua ayat terakhir QS. At-Taubah yang catatannya hanya ditemukan pada Abu Khuzaimah Al-Anshari yang kesaksiannya disamakan dengan dua saksi).',
+      'Zaid bin Tsabit mensyaratkan bukti ganda berupa hafalan sekaligus catatan tertulis yang disaksikan oleh dua orang saksi bahwa naskah tersebut ditulis di hadapan Rasulullah ﷺ (kecuali dua ayat terakhir QS. At-Taubah yang kesaksian Abu Khuzaimah disamakan dengan dua saksi).',
     reference:
       'Manna Al-Qaththan, Pengantar Studi Ilmu Al-Qur’an, Bab 8; H. Sardana, Pondasi Dasar Memahami ‘Ulûmul Qur’ân, Bab V',
-    difficulty: 'SEDANG',
+    difficulty: 'MUDAH',
     points: 10,
     timeLimitSec: 45,
     enabledModes: ['CERDAS_CERMAT', 'PAPAN_TANTANGAN'],
@@ -322,20 +315,19 @@ export const ULUMUL_QURAN_QUESTIONS: Array<Omit<QuestionPrivate, 'createdAt' | '
     subtopic: 'Mushaf Utsmani',
     type: 'MULTIPLE_CHOICE',
     questionText:
-      'Menyikapi laporan Hudzaifah bin Al-Yaman tentang perselisihan bacaan di Armenia dan Azerbaijan, Khalifah Utsman bin Affan membentuk tim penyalin (Zaid bin Tsabit dan tiga tokoh Quraisy). Pedoman apa yang diperintahkan Utsman apabila terjadi perbedaan bahasa penulisan di antara mereka?',
+      'Apa instruksi Khalifah Utsman bin Affan kepada tim penyalin mushaf apabila terjadi perbedaan pendapat dalam penulisan kata?',
     options: [
-      'Menuliskannya menurut dialek bahasa Quraisy (lisan Quraisy) karena Al-Qur’an diturunkan dalam bahasa mereka',
-      'Menuliskannya menurut dialek suku Hudzail atau Tamim sesuai kesepakatan pasukan Syam',
-      'Mencantumkan seluruh variasi dialek tujuh kabilah Arab berdampingan pada satu baris mushaf',
-      'Menyerahkan pilihan ejaan kata kepada gubernur Kufah dan Bashrah masing-masing',
+      'Menuliskannya sesuai dialek Quraisy karena Al-Qur’an turun dengan bahasa mereka',
+      'Menuliskannya memakai dialek Syam atau Irak sesuai pilihan pasukan',
+      'Mencantumkan seluruh variasi dialek Arab pada setiap baris mushaf',
+      'Menyerahkan penentuan ejaan kepada masing-masing gubernur wilayah',
     ],
-    correctAnswer:
-      'Menuliskannya menurut dialek bahasa Quraisy (lisan Quraisy) karena Al-Qur’an diturunkan dalam bahasa mereka',
+    correctAnswer: 'Menuliskannya sesuai dialek Quraisy karena Al-Qur’an turun dengan bahasa mereka',
     explanation:
-      'Utsman berpesan kepada tiga anggota tim dari suku Quraisy (Abdullah bin Az-Zubair, Sa’id bin Al-Ash, dan Abdurrahman bin Al-Harits bin Hisyam): jika mereka berselisih dengan Zaid bin Tsabit mengenai penulisan kata dalam Al-Qur’an, tulislah dengan bahasa Quraisy (seperti penulisan kata at-tabut dengan huruf ta’). Tujuannya menyeragamkan mushaf induk (Mushaf al-Imam) untuk meredam perpecahan umat.',
+      'Utsman berpesan kepada anggota tim dari suku Quraisy: jika berselisih pendapat dengan Zaid bin Tsabit mengenai tulisan kata Al-Qur’an, tulislah dengan bahasa Quraisy karena Al-Qur’an diturunkan dengan bahasa mereka.',
     reference:
       'Manna Al-Qaththan, Pengantar Studi Ilmu Al-Qur’an, Bab 8 (Pengumpulan Al-Qur’an Masa Utsman); H. Sardana, Bab V',
-    difficulty: 'SEDANG',
+    difficulty: 'MUDAH',
     points: 10,
     timeLimitSec: 45,
     enabledModes: ['CERDAS_CERMAT', 'PAPAN_TANTANGAN'],
@@ -346,20 +338,19 @@ export const ULUMUL_QURAN_QUESTIONS: Array<Omit<QuestionPrivate, 'createdAt' | '
     questionId: 'uq_q_12',
     topicId: 'topic_uq_jam',
     topicName: 'Pengumpulan & Penyusunan Al-Qur’an',
-    subtopic: 'Tertib Ayat Tauqifi',
+    subtopic: 'Urutan Ayat Tauqifi',
     type: 'MULTIPLE_CHOICE',
     questionText:
-      'Berdasarkan ijma’ para ulama dalam pembahasan pengumpulan dan penertiban Al-Qur’an, bagaimanakah status susunan (tartib) ayat-ayat di dalam setiap surat Al-Qur’an?',
+      'Bagaimana kedudukan susunan dan urutan ayat-ayat dalam setiap surat Al-Qur’an menurut ijma’ ulama?',
     options: [
-      'Bersifat Tauqifi, yaitu ketentuan langsung dari Rasulullah ﷺ atas petunjuk Malaikat Jibril dan bukan ijtihad sahabat',
-      'Bersifat Ijtihadi murni hasil penyusunan panitia Utsman bin Affan berdasarkan panjang pendeknya ayat',
-      'Mengikuti urutan kronologis turunnya ayat dari awal kenabian hingga wafatnya Nabi ﷺ',
-      'Disusun ulang menurut urutan abjad huruf pertama pada setiap ayat oleh Abul Aswad Ad-Duali',
+      'Bersifat Tauqifi, ditetapkan langsung oleh Nabi ﷺ atas petunjuk Jibril',
+      'Hasil ijtihad panitia Utsman bin Affan berdasarkan panjang pendeknya ayat',
+      'Diurutkan secara kronologis dari ayat pertama hingga ayat terakhir turun',
+      'Disusun berdasarkan abjad awal ayat pada generasi setelah sahabat',
     ],
-    correctAnswer:
-      'Bersifat Tauqifi, yaitu ketentuan langsung dari Rasulullah ﷺ atas petunjuk Malaikat Jibril dan bukan ijtihad sahabat',
+    correctAnswer: 'Bersifat Tauqifi, ditetapkan langsung oleh Nabi ﷺ atas petunjuk Jibril',
     explanation:
-      'Ulama bersepakat (ijma’) bahwa penertiban ayat-ayat di dalam surat adalah tauqifi — ditetapkan langsung oleh Rasulullah ﷺ berdasarkan bimbingan Malaikat Jibril. Nabi ﷺ selalu memerintahkan penulis wahyu untuk meletakkan ayat tertentu pada surat dan posisi yang telah ditentukan.',
+      'Para ulama sepakat (ijma’) bahwa urutan ayat dalam setiap surat adalah tauqifi: langsung ditentukan oleh Rasulullah ﷺ sesuai petunjuk Malaikat Jibril, bukan hasil pemikiran sahabat.',
     reference:
       'Manna Al-Qaththan, Pengantar Studi Ilmu Al-Qur’an, Bab 8 (Tertib Ayat dan Surat); H. Sardana, Bab V',
     difficulty: 'MUDAH',
@@ -373,20 +364,19 @@ export const ULUMUL_QURAN_QUESTIONS: Array<Omit<QuestionPrivate, 'createdAt' | '
     questionId: 'uq_q_13',
     topicId: 'topic_uq_ahruf',
     topicName: 'Tujuh Huruf (Sab‘atu Ahruf)',
-    subtopic: 'Hikmah Keringanan',
+    subtopic: 'Alasan Keringanan',
     type: 'MULTIPLE_CHOICE',
     questionText:
-      'Dalam hadis Ubay bin Ka’ab رضي الله عنه ketika Rasulullah ﷺ memohon kepada Allah melalui Jibril agar Al-Qur’an diringankan bacaannya dari satu huruf hingga tujuh huruf, apakah alasan utama permohonan Nabi ﷺ tersebut?',
+      'Berdasarkan hadis Ubay bin Ka’ab, mengapa Rasulullah ﷺ memohon keringanan agar Al-Qur’an diturunkan dalam tujuh huruf (Sab‘atu Ahruf)?',
     options: [
-      'Karena umat beliau terdiri atas masyarakat ummi, termasuk kakek-kakek, nenek-nenek, anak-anak, dan hamba sahaya yang sulit membaca satu huruf/dialek saja',
-      'Karena Al-Qur’an harus diterjemahkan ke dalam tujuh bahasa kerajaan asing di luar Jazirah Arab',
-      'Agar setiap suku diizinkan mengganti kandungan hukum ayat sesuai tradisi adatnya',
-      'Karena jumlah surat terpanjang (ath-thiwal) dalam mushaf berjumlah tujuh surat',
+      'Untuk memudahkan umat yang ummi, terdiri dari lansia, anak-anak, dan hamba sahaya',
+      'Karena Al-Qur’an wajib diterjemahkan ke dalam tujuh bahasa kerajaan lain',
+      'Agar setiap kabilah bebas mengubah hukum ayat sesuai adat masing-masing',
+      'Karena surat-surat terpanjang dalam Al-Qur’an berjumlah tujuh surat',
     ],
-    correctAnswer:
-      'Karena umat beliau terdiri atas masyarakat ummi, termasuk kakek-kakek, nenek-nenek, anak-anak, dan hamba sahaya yang sulit membaca satu huruf/dialek saja',
+    correctAnswer: 'Untuk memudahkan umat yang ummi, terdiri dari lansia, anak-anak, dan hamba sahaya',
     explanation:
-      'Pada hadis riwayat Ubay bin Ka’ab di Ahjar Mira’, Nabi ﷺ menjelaskan kepada Jibril bahwa umatnya adalah bangsa yang ummi; di antara mereka terdapat orang tua renta, nenek-nenek, anak-anak, dan hamba sahaya yang tidak pernah membaca kitab sebelumnya. Atas permohonan keringanan itu, Jibril menambah izin bacaan bertahap hingga tujuh huruf demi memudahkan bacaan dan hafalan mereka.',
+      'Rasulullah ﷺ memohon keringanan kepada Jibril karena umatnya merupakan masyarakat yang ummi—terdapat kakek-kakek, nenek-nenek, anak-anak, dan hamba sahaya yang kesulitan jika hanya diwajibkan satu cara bacaan/dialek saja.',
     reference:
       'Manna Al-Qaththan, Pengantar Studi Ilmu Al-Qur’an, Bab 9 (Turunnya Al-Qur’an dengan Tujuh Huruf)',
     difficulty: 'MUDAH',
@@ -400,22 +390,21 @@ export const ULUMUL_QURAN_QUESTIONS: Array<Omit<QuestionPrivate, 'createdAt' | '
     questionId: 'uq_q_14',
     topicId: 'topic_uq_ahruf',
     topicName: 'Tujuh Huruf (Sab‘atu Ahruf)',
-    subtopic: 'Makna Tujuh Bahasa/Dialek',
+    subtopic: 'Pengertian Tujuh Huruf',
     type: 'MULTIPLE_CHOICE',
     questionText:
-      'Di antara beragam pendapat ulama mengenai pengertian "Tujuh Huruf" (Sab‘atu Ahruf), pendapat manakah yang dinilai paling kuat dan dipilih oleh mayoritas ulama seperti Ath-Thabari, Ibnu Abdil Barr, dan Manna Al-Qaththan?',
+      'Menurut pendapat terkuat para ulama, apakah yang dimaksud dengan "Tujuh Huruf" (Sab‘atu Ahruf)?',
     options: [
-      'Tujuh macam bahasa atau dialek Arab mengenai satu makna yang sama (lafaz berbeda namun maknanya sinonim)',
-      'Tujuh tingkatan makna batin dan tafsir isyari yang hanya dipahami oleh kalangan tertentu',
-      'Tujuh jenis tanda baca harakat dan titik huruf yang disusun pada masa Daulah Umayyah',
-      'Angka tujuh semata-mata simbol kesempurnaan, bukan jumlah tujuh yang sebenarnya',
+      'Tujuh variasi bahasa/dialek Arab yang berbeda lafaznya namun satu maknanya',
+      'Tujuh tingkatan makna batin yang hanya diketahui ulama tertentu',
+      'Tujuh jenis tanda baca harakat dan titik pada huruf hijaiyah',
+      'Kiasan untuk jumlah yang banyak, bukan bilangan tujuh yang sebenarnya',
     ],
-    correctAnswer:
-      'Tujuh macam bahasa atau dialek Arab mengenai satu makna yang sama (lafaz berbeda namun maknanya sinonim)',
+    correctAnswer: 'Tujuh variasi bahasa/dialek Arab yang berbeda lafaznya namun satu maknanya',
     explanation:
-      'Pendapat terkuat menegaskan bahwa Sab‘atu Ahruf adalah tujuh ragam ungkapan/bahasa dari bahasa-bahasa Arab yang menunjuk satu makna yang sama (seperti lafaz halumma, ta’al, aqbil yang semuanya bermakna "kemarilah"), selama ayat rahmat tidak diakhiri azab atau sebaliknya. Pendapat yang memaknai tujuh sekadar simbol terbantahkan oleh hadis peningkatan bertahap dari 1, 2, 3, hingga 7 huruf.',
+      'Pendapat paling kuat menyatakan bahwa Tujuh Huruf adalah tujuh ragam ungkapan/dialek dari bahasa Arab yang artinya sama (seperti kata halumma, ta’al, dan aqbil yang semuanya berarti "kemarilah"), selama tidak mencampur ayat rahmat dengan azab.',
     reference:
-      'Manna Al-Qaththan, Pengantar Studi Ilmu Al-Qur’an, Bab 9 (Perbedaan Pendapat Tentang Pengertian Tujuh Huruf)',
+      'Manna Al-Qaththan, Pengantar Studi Ilmu Al-Qur’an, Bab 9 (Pengertian Tujuh Huruf)',
     difficulty: 'SEDANG',
     points: 10,
     timeLimitSec: 45,
@@ -430,20 +419,20 @@ export const ULUMUL_QURAN_QUESTIONS: Array<Omit<QuestionPrivate, 'createdAt' | '
     subtopic: 'Tujuh Huruf vs Qira’at Sab‘ah',
     type: 'MULTIPLE_CHOICE',
     questionText:
-      'Sebagian kalangan kerap menyamakan "Tujuh Huruf" (Sab‘atu Ahruf) dengan Qira’at Sab‘ah (Tujuh Imam Qira’at). Bagaimanakah pelurusan para ulama seperti Abu Syamah dan Manna Al-Qaththan atas anggapan tersebut?',
+      'Apakah "Tujuh Huruf" (Sab‘atu Ahruf) identik dengan "Qira’at Sab‘ah" (Tujuh Imam Qira’at)?',
     options: [
-      'Anggapan itu keliru; Qira’at Sab‘ah baru dipilih pada abad ke-3 H oleh Abu Bakar bin Mujahid dari satu huruf (Mushaf Utsmani), sedangkan tujuh huruf ada sebelum penyeragaman Utsman',
-      'Anggapan itu tepat karena ketujuh imam qira’at menerima langsung masing-masing satu huruf dari Rasulullah ﷺ',
-      'Qira’at Sab‘ah mencakup tujuh bahasa asing non-Arab yang disusun ulang pada masa Abu Bakar Ash-Shiddiq',
-      'Tujuh huruf baru lahir bersamaan dengan pemberian tanda titik huruf oleh Al-Khalil bin Ahmad Al-Farahidi',
+      'Tidak; Qira’at Sab‘ah diseleksi pada abad ke-3 H dalam bingkai Mushaf Utsmani, sedangkan Tujuh Huruf ada sejak masa Nabi ﷺ',
+      'Sama persis, sebab tujuh imam qira’at masing-masing menerima satu huruf langsung dari Nabi ﷺ',
+      'Sama, karena Qira’at Sab‘ah merupakan terjemahan Al-Qur’an dalam tujuh bahasa asing',
+      'Tidak; Tujuh Huruf baru dirumuskan setelah pemberian titik dan syakal huruf',
     ],
     correctAnswer:
-      'Anggapan itu keliru; Qira’at Sab‘ah baru dipilih pada abad ke-3 H oleh Abu Bakar bin Mujahid dari satu huruf (Mushaf Utsmani), sedangkan tujuh huruf ada sebelum penyeragaman Utsman',
+      'Tidak; Qira’at Sab‘ah diseleksi pada abad ke-3 H dalam bingkai Mushaf Utsmani, sedangkan Tujuh Huruf ada sejak masa Nabi ﷺ',
     explanation:
-      'Para ulama membantah tegas penyamaan Tujuh Huruf dengan Qira’at Sab‘ah. Khalifah Utsman bin Affan telah menyatukan umat pada satu huruf (dialek Quraisy) pada abad ke-1 H. Sementara itu, tujuh imam qira’at (Qira’at Sab‘ah) baru diseleksi dan dipopulerkan oleh Ibnu Mujahid pada abad ke-3 H dan seluruh bacaan mereka berada dalam bingkai satu huruf Mushaf Utsmani tersebut.',
+      'Para ulama meluruskan bahwa Tujuh Huruf berbeda dengan Qira’at Sab‘ah. Khalifah Utsman telah menyeragamkan mushaf pada satu huruf (dialek Quraisy) pada abad ke-1 H, sedangkan Qira’at Sab‘ah baru diseleksi oleh Ibnu Mujahid pada abad ke-3 H dalam bingkai Mushaf Utsmani tersebut.',
     reference:
       'Manna Al-Qaththan, Pengantar Studi Ilmu Al-Qur’an, Bab 9; H. Sardana, Pondasi Dasar Memahami ‘Ulûmul Qur’ân, Bab V (hlm. 49–50)',
-    difficulty: 'SULIT',
+    difficulty: 'SEDANG',
     points: 10,
     timeLimitSec: 45,
     enabledModes: ['CERDAS_CERMAT', 'PAPAN_TANTANGAN'],

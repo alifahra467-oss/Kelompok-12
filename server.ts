@@ -337,6 +337,97 @@ async function startServer() {
     res.json({ attempts: quizAttempts });
   });
 
+  // Student Entry Check-in Registry (Nama Lengkap & NIM — readable exclusively by Admin)
+  interface StoredStudentCheckin {
+    checkinId: string;
+    fullName: string;
+    nim: string;
+    targetMode: 'KUIS_PG' | 'SESI_KELAS';
+    checkedInAtMs: number;
+  }
+
+  const checkinsFile = path.join(__dirname, 'data', 'student_checkins.json');
+  let studentCheckins: StoredStudentCheckin[] = [];
+  try {
+    if (fs.existsSync(checkinsFile)) {
+      const parsed = JSON.parse(fs.readFileSync(checkinsFile, 'utf8')) as StoredStudentCheckin[];
+      if (Array.isArray(parsed)) studentCheckins = parsed;
+    }
+  } catch {
+    studentCheckins = [];
+  }
+
+  const persistCheckins = () => {
+    try {
+      fs.mkdirSync(path.dirname(checkinsFile), { recursive: true });
+      fs.writeFileSync(checkinsFile, JSON.stringify(studentCheckins, null, 2), 'utf8');
+    } catch {
+      // Non-blocking in ephemeral filesystems
+    }
+  };
+
+  app.post('/api/student/check-in', (req, res) => {
+    const { checkinId, fullName, nim, targetMode } = req.body ?? {};
+    if (
+      typeof fullName !== 'string' ||
+      fullName.trim().length < 2 ||
+      fullName.trim().length > 60
+    ) {
+      res.status(400).json({ error: 'Nama lengkap minimal 2 karakter.' });
+      return;
+    }
+    const cleanNim = typeof nim === 'string' ? nim.replace(/\s+/g, '').trim().slice(0, 30) : '';
+    if (cleanNim.length < 3) {
+      res.status(400).json({ error: 'NIM minimal 3 karakter.' });
+      return;
+    }
+    const validMode: 'KUIS_PG' | 'SESI_KELAS' =
+      targetMode === 'SESI_KELAS' ? 'SESI_KELAS' : 'KUIS_PG';
+
+    const cleanId =
+      typeof checkinId === 'string' && /^[a-zA-Z0-9_-]{4,128}$/.test(checkinId)
+        ? checkinId
+        : `chk_${Date.now()}_${crypto.randomBytes(4).toString('hex')}`;
+
+    const record: StoredStudentCheckin = {
+      checkinId: cleanId,
+      fullName: fullName.trim(),
+      nim: cleanNim,
+      targetMode: validMode,
+      checkedInAtMs: Date.now(),
+    };
+
+    studentCheckins = [
+      record,
+      ...studentCheckins.filter((item) => item.checkinId !== cleanId),
+    ].slice(0, 1000);
+    persistCheckins();
+
+    res.json({ ok: true, checkinId: cleanId });
+  });
+
+  app.get('/api/admin/student-checkins', (req, res) => {
+    const token = req.headers['x-admin-unlock-token'];
+    if (typeof token !== 'string' || !verifyAdminUnlockToken(token)) {
+      res.status(403).json({ error: 'Akses khusus admin.' });
+      return;
+    }
+    res.setHeader('Cache-Control', 'no-store');
+    res.json({ checkins: studentCheckins });
+  });
+
+  app.delete('/api/admin/student-checkins/:checkinId', (req, res) => {
+    const token = req.headers['x-admin-unlock-token'];
+    if (typeof token !== 'string' || !verifyAdminUnlockToken(token)) {
+      res.status(403).json({ error: 'Akses khusus admin.' });
+      return;
+    }
+    const { checkinId } = req.params;
+    studentCheckins = studentCheckins.filter((item) => item.checkinId !== checkinId);
+    persistCheckins();
+    res.json({ ok: true });
+  });
+
   if (process.env.NODE_ENV === 'production') {
     const distDir = path.join(__dirname, 'dist');
     app.use(express.static(distDir));

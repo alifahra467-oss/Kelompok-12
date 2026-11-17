@@ -14,7 +14,11 @@ import {
 import { ArabicText } from '../../components/ArabicText';
 import { LoadingState } from '../../components/StatusViews';
 import type { PublicUlumulQuranQuestion } from '../../lib/ulumulQuranQuestions';
-import { loadStudentProfile, saveStudentProfile } from '../../lib/studentProfile';
+import {
+  loadStudentProfile,
+  recordStudentCheckin,
+  saveStudentProfile,
+} from '../../lib/studentProfile';
 
 interface ReviewItem {
   questionId: string;
@@ -113,6 +117,13 @@ export const UlumulQuranQuizPage: React.FC = () => {
     const cleanNim = studentNim.trim();
     if (cleanName.length < 2) return;
     saveStudentProfile({ fullName: cleanName, nim: cleanNim });
+    if (cleanNim.length >= 3) {
+      void recordStudentCheckin({
+        fullName: cleanName,
+        nim: cleanNim,
+        targetMode: 'KUIS_PG',
+      });
+    }
     setStarted(true);
     setCurrentIdx(0);
     setSubmitError(null);
@@ -167,26 +178,32 @@ export const UlumulQuranQuizPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#FAF8F5] text-[#1E3A2F] flex flex-col">
+    <div
+      className="min-h-[100dvh] text-[#0B2A4A] flex flex-col"
+      style={{
+        background:
+          'linear-gradient(135deg, #E8FAF3 0%, #EDF4FF 52%, #FFF7EA 100%)',
+      }}
+    >
       {/* Header */}
-      <header className="border-b border-[#1B5E4B]/15 bg-white sticky top-0 z-20">
-        <div className="max-w-5xl mx-auto px-5 sm:px-8 h-16 flex items-center justify-between gap-4">
-          <Link to="/" className="flex items-center gap-3 min-w-0 whitespace-nowrap shrink-0">
+      <header className="bg-gradient-to-r from-[#0B2A4A] via-[#0F4C5C] to-[#1B5E4B] text-white border-b border-white/15 shadow-[0_6px_20px_rgba(11,42,74,0.14)] sticky top-0 z-20">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 h-14 sm:h-16 flex items-center justify-between gap-4">
+          <Link to="/" className="flex items-center gap-2.5 sm:gap-3 min-w-0 whitespace-nowrap shrink-0">
             <img
-              src="/src/assets/images/stiu_emblem_notext_1794928187045.jpg"
+              src="/assets/aistudio/6d10c951-fc5f-4e1d-b919-a6f0372576d5_removalai_preview__1__22e3f2ea.png"
               alt="Logo STIU Darul Hikmah"
               referrerPolicy="no-referrer"
-              className="w-9 h-9 rounded-xl object-cover border border-[#1B5E4B]/20 bg-[#E2EFEA] shrink-0"
+              className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl object-contain bg-white p-0.5 shadow-sm border border-white/40 shrink-0"
             />
-            <span className="font-display text-base font-extrabold tracking-tight text-[#1B5E4B] truncate">
+            <span className="font-display text-sm sm:text-base font-extrabold tracking-tight text-white truncate">
               STIU Darul Hikmah
             </span>
           </Link>
 
-          <nav className="flex items-center gap-5 text-sm font-semibold">
+          <nav className="flex items-center gap-4 text-xs sm:text-sm font-semibold">
             <Link
               to="/join"
-              className="text-[#1B5E4B] hover:text-[#2E7D67] hover:underline underline-offset-4 flex items-center gap-1.5 whitespace-nowrap shrink-0"
+              className="min-h-[40px] px-3.5 py-1.5 rounded-full bg-white/12 hover:bg-white/22 border border-white/25 flex items-center gap-1.5 text-white hover:text-[#FDE047] transition-colors whitespace-nowrap shrink-0"
             >
               <ArrowLeft className="w-4 h-4" />
               <span>Sesi Kelas</span>
@@ -195,7 +212,7 @@ export const UlumulQuranQuizPage: React.FC = () => {
         </div>
       </header>
 
-      <main className="flex-1 max-w-4xl w-full mx-auto px-4 sm:px-8 py-8">
+      <main className="flex-1 max-w-4xl w-full mx-auto px-3.5 sm:px-6 lg:px-8 py-5 sm:py-8">
         {loading ? (
           <div className="bg-white rounded-3xl border border-[#1B5E4B]/15 p-10">
             <LoadingState label="Memuat 15 soal pilihan ganda ‘Ulûmul Qur’ân..." />
@@ -223,10 +240,10 @@ export const UlumulQuranQuizPage: React.FC = () => {
                   <h1 className="font-display text-2xl sm:text-3xl font-extrabold">
                     Hasil Kuis Pilihan Ganda ‘Ulûmul Qur’ân
                   </h1>
-                  <p className="text-sm text-white/85">
+                  <p className="text-[14px] text-white/90 text-left">
                     Mahasiswi: <span className="font-bold text-white">{result.studentName}</span>
                     {result.studentNim && (
-                      <span className="ml-2 font-mono text-xs text-[#DFBD69] tabular-nums">
+                      <span className="ml-2 text-[13px] text-[#DFBD69] tabular-nums">
                         · NIM {result.studentNim}
                       </span>
                     )}
@@ -234,11 +251,11 @@ export const UlumulQuranQuizPage: React.FC = () => {
                 </div>
 
                 <div className="bg-white/10 border border-white/20 rounded-2xl px-6 py-4 text-center shrink-0">
-                  <div className="text-xs font-semibold text-white/80">Skor Akhir</div>
-                  <div className="font-mono text-3xl font-extrabold text-[#DFBD69] tabular-nums">
+                  <div className="text-[12px] font-semibold text-white/80">Skor Akhir</div>
+                  <div className="text-[28px] font-extrabold text-[#DFBD69] tabular-nums leading-tight">
                     {result.totalCorrect} / {result.totalQuestions}
                   </div>
-                  <div className="text-xs font-bold text-white tabular-nums mt-0.5">
+                  <div className="text-[13px] font-bold text-white tabular-nums mt-0.5">
                     Nilai: {result.percentage}%
                   </div>
                 </div>
@@ -251,10 +268,10 @@ export const UlumulQuranQuizPage: React.FC = () => {
                     key={item.topicName}
                     className="rounded-2xl bg-white/10 border border-white/15 p-3.5 space-y-1"
                   >
-                    <div className="text-xs text-white/85 font-semibold leading-snug">
+                    <div className="text-[12px] text-white/85 font-semibold leading-snug text-left">
                       {item.topicName}
                     </div>
-                    <div className="font-mono text-lg font-extrabold text-white tabular-nums">
+                    <div className="text-[17px] font-extrabold text-white tabular-nums text-left">
                       {item.correct} / {item.total} Benar
                     </div>
                   </div>
@@ -293,82 +310,92 @@ export const UlumulQuranQuizPage: React.FC = () => {
               {result.reviewItems.map((item) => (
                 <article
                   key={item.questionId}
-                  className="bg-white rounded-3xl border border-[#1B5E4B]/15 p-5 sm:p-6 space-y-4"
+                  className="bg-white rounded-3xl border border-[#1B5E4B]/15 p-5 sm:p-7 space-y-4 text-left shadow-[0_8px_22px_rgba(27,94,75,0.05)]"
                 >
                   <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-3">
-                    <div className="text-xs font-bold text-[#1B5E4B]/80">
+                    <div className="text-[13px] font-bold text-[#1B5E4B]">
                       SOAL #{item.number} · {item.topicName}
                     </div>
                     {item.isCorrect ? (
-                      <div className="flex items-center gap-1.5 text-xs font-bold text-emerald-700">
-                        <CheckCircle2 className="w-4 h-4" />
+                      <div className="flex items-center gap-1.5 text-[13px] font-bold text-emerald-700">
+                        <CheckCircle2 className="w-4 h-4 shrink-0" />
                         <span>Jawaban Benar</span>
                       </div>
                     ) : (
-                      <div className="flex items-center gap-1.5 text-xs font-bold text-rose-700">
-                        <XCircle className="w-4 h-4" />
+                      <div className="flex items-center gap-1.5 text-[13px] font-bold text-rose-700">
+                        <XCircle className="w-4 h-4 shrink-0" />
                         <span>Jawaban Kurang Tepat</span>
                       </div>
                     )}
                   </div>
 
                   <ArabicText
+                    as="p"
                     text={item.questionText}
-                    className="text-base font-bold text-[#1E3A2F] leading-relaxed"
+                    className="block w-full text-left text-[18px] font-bold text-[#1E3A2F] leading-[1.6]"
                   />
 
-                  <div className="space-y-2">
+                  <div className="space-y-2.5">
                     {item.options.map((opt, idx) => {
                       const isCorrectOpt = opt === item.correctAnswer;
                       const isStudentOpt = opt === item.selectedOption;
 
-                      let rowClass = 'border-slate-200 bg-[#FAF8F5] text-slate-700';
+                      let rowClass = 'border-slate-200 bg-[#FAF8F5] text-[#1E3A2F] font-medium';
                       let badgeClass = 'bg-white border-slate-300 text-slate-600';
 
                       if (isCorrectOpt) {
                         rowClass = 'border-[#2E7D67] bg-[#E2EFEA] text-[#1E3A2F] font-semibold';
                         badgeClass = 'bg-[#1B5E4B] border-[#1B5E4B] text-white';
                       } else if (isStudentOpt && !isCorrectOpt) {
-                        rowClass = 'border-rose-300 bg-rose-50 text-rose-950';
+                        rowClass = 'border-rose-300 bg-rose-50 text-rose-950 font-medium';
                         badgeClass = 'bg-rose-600 border-rose-600 text-white';
                       }
 
                       return (
                         <div
                           key={idx}
-                          className={`p-3.5 rounded-2xl border text-sm flex items-start gap-3 ${rowClass}`}
+                          className={`px-4 py-3.5 rounded-2xl border text-left flex items-start gap-3 ${rowClass}`}
                         >
                           <span
-                            className={`w-7 h-7 rounded-xl border flex items-center justify-center text-xs font-extrabold shrink-0 ${badgeClass}`}
+                            className={`w-7 h-7 rounded-xl border flex items-center justify-center text-[13px] font-bold shrink-0 mt-0.5 ${badgeClass}`}
                           >
                             {String.fromCharCode(65 + idx)}
                           </span>
-                          <div className="flex-1 space-y-1">
-                            <ArabicText text={opt} />
-                            <div className="flex flex-wrap gap-3 text-[11px] font-bold">
-                              {isStudentOpt && (
-                                <span className={isCorrectOpt ? 'text-[#1B5E4B]' : 'text-rose-700'}>
-                                  Pilihan Anda
-                                </span>
-                              )}
-                              {isCorrectOpt && (
-                                <span className="text-[#1B5E4B]">Kunci Jawaban Benar</span>
-                              )}
-                            </div>
+                          <div className="flex-1 min-w-0 space-y-1 text-left">
+                            <ArabicText
+                              as="p"
+                              text={opt}
+                              className="block w-full text-left text-[15px] leading-[1.55]"
+                            />
+                            {(isStudentOpt || isCorrectOpt) && (
+                              <div className="flex flex-wrap gap-3 text-[12px] font-bold text-left">
+                                {isStudentOpt && (
+                                  <span className={isCorrectOpt ? 'text-[#1B5E4B]' : 'text-rose-700'}>
+                                    Pilihan Anda
+                                  </span>
+                                )}
+                                {isCorrectOpt && (
+                                  <span className="text-[#1B5E4B]">Kunci Jawaban Benar</span>
+                                )}
+                              </div>
+                            )}
                           </div>
                         </div>
                       );
                     })}
                   </div>
 
-                  <div className="rounded-2xl bg-[#FAF8F5] border border-[#1B5E4B]/15 p-4 space-y-1.5">
-                    <div className="text-xs font-bold text-[#1B5E4B]">Pembahasan Materi</div>
+                  <div className="rounded-2xl bg-[#FAF8F5] border border-[#1B5E4B]/15 p-4 space-y-1.5 text-left">
+                    <div className="text-[13px] font-bold text-[#1B5E4B] text-left">
+                      Pembahasan Materi
+                    </div>
                     <ArabicText
+                      as="p"
                       text={item.explanation}
-                      className="text-xs sm:text-sm text-slate-700 leading-relaxed"
+                      className="block w-full text-left text-[14px] text-slate-700 leading-[1.6]"
                     />
                     {item.reference && (
-                      <div className="text-[11px] font-semibold text-slate-500 pt-1">
+                      <div className="text-[12px] font-semibold text-slate-500 pt-1 text-left">
                         Rujukan: {item.reference}
                       </div>
                     )}
@@ -379,16 +406,16 @@ export const UlumulQuranQuizPage: React.FC = () => {
           </div>
         ) : !started ? (
           /* STEP 1: IDENTITAS MAHASISWI (JIKA MASUK LANGSUNG KE /kuis-pg) */
-          <div className="max-w-md mx-auto bg-[#E2EFEA] rounded-[32px] border-2 border-white shadow-[0_15px_35px_rgba(46,125,103,0.12)] p-7 sm:p-8 space-y-6 relative overflow-hidden">
+          <div className="max-w-md sm:max-w-lg mx-auto bg-white/70 backdrop-blur-xl rounded-[28px] sm:rounded-[32px] border-2 border-white shadow-[0_18px_40px_rgba(11,42,74,0.1)] p-6 sm:p-9 space-y-6 relative overflow-hidden">
             <div
               aria-hidden="true"
-              className="absolute inset-0 flex items-center justify-center pointer-events-none z-[1]"
+              className="absolute inset-2 sm:inset-3 flex items-center justify-center pointer-events-none z-[1]"
             >
               <img
-                src="/src/assets/images/stiu_emblem_notext_1794928187045.jpg"
+                src="/assets/aistudio/6d10c951-fc5f-4e1d-b919-a6f0372576d5_removalai_preview__1__22e3f2ea.png"
                 alt=""
                 referrerPolicy="no-referrer"
-                className="w-[82%] h-[82%] object-contain opacity-[0.18] mix-blend-multiply select-none"
+                className="w-full h-full object-contain opacity-[0.26] mix-blend-multiply select-none"
               />
             </div>
 
@@ -397,10 +424,10 @@ export const UlumulQuranQuizPage: React.FC = () => {
                 <BookOpen className="w-4 h-4" />
                 <span>Pilihan Ganda ‘Ulûmul Qur’ân · 15 Soal</span>
               </div>
-              <h1 className="font-display text-2xl font-extrabold text-[#1B5E4B]">
-                STIU Darul Hikmah
+              <h1 className="font-display text-xl sm:text-2xl font-extrabold text-[#0B2A4A]">
+                Kuis 15 Soal ‘Ulûmul Qur’ân
               </h1>
-              <p className="text-xs text-[#1E3A2F]/80 leading-relaxed">
+              <p className="text-xs sm:text-sm text-[#1E3A2F]/80 leading-relaxed">
                 Bab Asbabun Nuzul, Turunnya Al-Qur’an, Pengumpulan &amp; Penyusunan, dan Tujuh Huruf. Jawaban ditampilkan di akhir setelah 15 soal selesai.
               </p>
             </div>
@@ -415,7 +442,7 @@ export const UlumulQuranQuizPage: React.FC = () => {
                 value={studentName}
                 onChange={(e) => setStudentName(e.target.value)}
                 placeholder="Nama Lengkap"
-                className="w-full px-6 py-4 rounded-[24px] bg-gradient-to-br from-[#2E7D67] to-[#1B5E4B] text-white placeholder:text-white/75 text-base font-bold shadow-[0_8px_18px_rgba(27,94,75,0.25)] outline-none focus:ring-2 focus:ring-[#D4AF37]"
+                className="w-full min-h-[52px] px-5 sm:px-6 py-3.5 sm:py-4 rounded-[20px] sm:rounded-[22px] bg-gradient-to-br from-[#0B2A4A] to-[#1B5E4B] text-white placeholder:text-white/75 text-base font-bold shadow-[0_8px_18px_rgba(11,42,74,0.2)] outline-none focus:ring-2 focus:ring-[#38BDF8]"
               />
               <input
                 type="text"
@@ -428,13 +455,13 @@ export const UlumulQuranQuizPage: React.FC = () => {
                   setStudentNim(e.target.value.replace(/[^0-9A-Za-z.-]/g, '').slice(0, 30))
                 }
                 placeholder="NIM"
-                className="w-full px-6 py-4 rounded-[24px] bg-gradient-to-br from-[#2E7D67] to-[#1B5E4B] text-white placeholder:text-white/75 text-base font-bold tabular-nums shadow-[0_8px_18px_rgba(27,94,75,0.25)] outline-none focus:ring-2 focus:ring-[#D4AF37]"
+                className="w-full min-h-[52px] px-5 sm:px-6 py-3.5 sm:py-4 rounded-[20px] sm:rounded-[22px] bg-gradient-to-br from-[#0B2A4A] to-[#1B5E4B] text-white placeholder:text-white/75 text-base font-bold tabular-nums shadow-[0_8px_18px_rgba(11,42,74,0.2)] outline-none focus:ring-2 focus:ring-[#38BDF8]"
               />
 
               <button
                 type="submit"
                 disabled={studentName.trim().length < 2 || studentNim.trim().length < 3}
-                className="w-full py-4 px-6 rounded-[24px] bg-gradient-to-br from-[#DFBD69] to-[#C59B38] text-[#1E3A2F] text-base font-extrabold shadow-[0_8px_18px_rgba(197,155,56,0.3)] hover:brightness-105 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+                className="w-full min-h-[52px] py-3.5 sm:py-4 px-6 rounded-[20px] sm:rounded-[22px] bg-gradient-to-br from-[#FDE047] via-[#FACC15] to-[#EAB308] text-[#0B2A4A] text-base font-extrabold shadow-[0_8px_18px_rgba(234,179,8,0.28)] hover:brightness-105 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
               >
                 <span>Mulai 15 Soal Pilihan Ganda</span>
                 <ArrowRight className="w-4 h-4" />
@@ -446,15 +473,15 @@ export const UlumulQuranQuizPage: React.FC = () => {
           <div className="space-y-5">
             {/* Progress & Navigator */}
             <div className="bg-[#E2EFEA] rounded-3xl border-2 border-white p-4 sm:p-5 space-y-4 shadow-[0_10px_25px_rgba(46,125,103,0.08)]">
-              <div className="flex flex-wrap items-center justify-between gap-2">
+              <div className="flex flex-wrap items-center justify-between gap-2 text-left">
                 <div>
-                  <div className="text-xs font-semibold text-[#1B5E4B]">
+                  <div className="text-[13px] font-semibold text-[#1B5E4B]">
                     Mahasiswi: <span className="font-extrabold">{studentName.trim()}</span>
                     {studentNim.trim() && (
-                      <span className="ml-2 font-mono tabular-nums">· NIM {studentNim.trim()}</span>
+                      <span className="ml-2 tabular-nums">· NIM {studentNim.trim()}</span>
                     )}
                   </div>
-                  <div className="text-xs text-[#1E3A2F]/75 mt-0.5">
+                  <div className="text-[13px] text-[#1E3A2F]/80 mt-0.5">
                     Jawaban dan pembahasan dibuka di akhir setelah semua 15 pertanyaan selesai.
                   </div>
                 </div>
@@ -462,11 +489,11 @@ export const UlumulQuranQuizPage: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => setStarted(false)}
-                    className="text-xs font-bold text-[#1B5E4B] hover:underline"
+                    className="text-[13px] font-bold text-[#1B5E4B] hover:underline"
                   >
                     Ubah Data
                   </button>
-                  <div className="font-mono text-sm font-extrabold text-[#1B5E4B] tabular-nums">
+                  <div className="text-[14px] font-extrabold text-[#1B5E4B] tabular-nums">
                     {answeredCount} / {questions.length} Terjawab
                   </div>
                 </div>
@@ -481,7 +508,7 @@ export const UlumulQuranQuizPage: React.FC = () => {
                 />
               </div>
 
-              <div className="grid grid-cols-5 sm:grid-cols-15 gap-1.5">
+              <div className="grid grid-cols-5 sm:grid-cols-8 lg:grid-cols-15 gap-2 lg:gap-1.5">
                 {questions.map((q, idx) => {
                   const isAnswered = Boolean(answers[q.questionId]);
                   const isCurrent = idx === currentIdx;
@@ -490,7 +517,7 @@ export const UlumulQuranQuizPage: React.FC = () => {
                       key={q.questionId}
                       type="button"
                       onClick={() => setCurrentIdx(idx)}
-                      className={`h-9 rounded-xl font-mono text-xs font-bold tabular-nums border transition-colors ${
+                      className={`min-h-[42px] sm:min-h-[44px] lg:min-h-[38px] rounded-xl text-[13px] font-bold tabular-nums border transition-colors ${
                         isCurrent
                           ? 'bg-[#1B5E4B] text-white border-[#1B5E4B]'
                           : isAnswered
@@ -506,29 +533,32 @@ export const UlumulQuranQuizPage: React.FC = () => {
             </div>
 
             {submitError && (
-              <div className="p-4 rounded-2xl bg-rose-50 border border-rose-200 text-xs font-semibold text-rose-800">
+              <div className="p-4 rounded-2xl bg-rose-50 border border-rose-200 text-[13px] font-semibold text-rose-800 text-left">
                 {submitError}
               </div>
             )}
 
             {/* Active Question Card */}
             {currentQuestion && (
-              <div className="bg-white rounded-3xl border border-[#1B5E4B]/15 p-5 sm:p-7 space-y-5 shadow-[0_10px_28px_rgba(27,94,75,0.06)]">
-                <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-3">
-                  <span className="text-xs font-extrabold text-[#2E7D67]">
+              <div className="bg-white rounded-3xl border border-[#1B5E4B]/15 p-5 sm:p-7 space-y-5 shadow-[0_10px_28px_rgba(27,94,75,0.06)] text-left">
+                <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-3.5">
+                  <span className="text-[13px] font-extrabold text-[#2E7D67] tracking-wide">
                     SOAL {currentQuestion.number} DARI {questions.length}
                   </span>
-                  <span className="text-xs font-semibold text-slate-600">
+                  <span className="text-[13px] font-semibold text-slate-600">
                     Bab: {currentQuestion.topicName}
                   </span>
                 </div>
 
+                {/* Pertanyaan: 18px Bold, Rata Kiri, Font Seragam */}
                 <ArabicText
+                  as="p"
                   text={currentQuestion.questionText}
-                  className="text-base sm:text-lg font-bold text-[#1E3A2F] leading-relaxed"
+                  className="block w-full text-left text-[18px] font-bold text-[#1E3A2F] leading-[1.6]"
                 />
 
-                <div className="space-y-2.5">
+                {/* Pilihan Jawaban: 15px Medium, Rata Kiri, Font Seragam & Tersusun Rapi */}
+                <div className="space-y-3 pt-1">
                   {currentQuestion.options.map((opt, optIdx) => {
                     const selected = answers[currentQuestion.questionId] === opt;
                     return (
@@ -536,14 +566,14 @@ export const UlumulQuranQuizPage: React.FC = () => {
                         key={optIdx}
                         type="button"
                         onClick={() => handleSelectOption(currentQuestion.questionId, opt)}
-                        className={`w-full min-h-[52px] p-4 rounded-2xl border text-left text-sm font-semibold flex items-start gap-3 transition-all ${
+                        className={`w-full min-h-[54px] px-4 py-3.5 rounded-2xl border text-left flex items-start gap-3.5 transition-all ${
                           selected
                             ? 'bg-gradient-to-br from-[#2E7D67] to-[#1B5E4B] text-white border-[#1B5E4B] shadow-[0_6px_16px_rgba(27,94,75,0.22)]'
                             : 'bg-[#FAF8F5] text-[#1E3A2F] border-[#1B5E4B]/15 hover:bg-[#E2EFEA]/60'
                         }`}
                       >
                         <span
-                          className={`w-7 h-7 rounded-xl flex items-center justify-center text-xs font-extrabold shrink-0 mt-0.5 ${
+                          className={`w-7 h-7 rounded-xl flex items-center justify-center text-[13px] font-bold shrink-0 mt-0.5 ${
                             selected
                               ? 'bg-[#DFBD69] text-[#1E3A2F]'
                               : 'bg-white border border-[#1B5E4B]/20 text-[#1B5E4B]'
@@ -551,19 +581,23 @@ export const UlumulQuranQuizPage: React.FC = () => {
                         >
                           {String.fromCharCode(65 + optIdx)}
                         </span>
-                        <ArabicText text={opt} className="flex-1 leading-relaxed" />
+                        <ArabicText
+                          as="span"
+                          text={opt}
+                          className="flex-1 min-w-0 block text-left text-[15px] font-medium leading-[1.55]"
+                        />
                       </button>
                     );
                   })}
                 </div>
 
-                <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-3 border-t border-slate-100">
-                  <div className="flex items-center gap-2">
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-4 border-t border-slate-100">
+                  <div className="flex items-center gap-2.5">
                     <button
                       type="button"
                       disabled={currentIdx === 0}
                       onClick={() => setCurrentIdx((i) => Math.max(0, i - 1))}
-                      className="min-h-[44px] px-4 py-2 rounded-2xl border border-[#1B5E4B]/25 text-xs font-bold text-[#1B5E4B] hover:bg-[#E2EFEA]/50 disabled:opacity-40 flex items-center gap-1.5"
+                      className="min-h-[44px] px-4 py-2 rounded-2xl border border-[#1B5E4B]/25 text-[13px] font-bold text-[#1B5E4B] hover:bg-[#E2EFEA]/50 disabled:opacity-40 flex items-center justify-center gap-1.5"
                     >
                       <ChevronLeft className="w-4 h-4" />
                       <span>Sebelumnya</span>
@@ -573,7 +607,7 @@ export const UlumulQuranQuizPage: React.FC = () => {
                       <button
                         type="button"
                         onClick={() => setCurrentIdx((i) => Math.min(questions.length - 1, i + 1))}
-                        className="min-h-[44px] px-4 py-2 rounded-2xl bg-[#1B5E4B] text-white text-xs font-bold hover:bg-[#2E7D67] flex items-center gap-1.5"
+                        className="min-h-[44px] px-4 py-2 rounded-2xl bg-[#1B5E4B] text-white text-[13px] font-bold hover:bg-[#2E7D67] flex items-center justify-center gap-1.5"
                       >
                         <span>Berikutnya</span>
                         <ChevronRight className="w-4 h-4" />
@@ -585,7 +619,7 @@ export const UlumulQuranQuizPage: React.FC = () => {
                     type="button"
                     disabled={!allCompleted || submitting}
                     onClick={() => void handleSubmitAll()}
-                    className="min-h-[46px] px-5 py-2.5 rounded-2xl bg-gradient-to-br from-[#DFBD69] to-[#C59B38] text-[#1E3A2F] text-sm font-extrabold shadow-[0_6px_16px_rgba(197,155,56,0.28)] hover:brightness-105 disabled:opacity-45 flex items-center justify-center gap-2"
+                    className="min-h-[46px] px-5 py-2.5 rounded-2xl bg-gradient-to-br from-[#DFBD69] to-[#C59B38] text-[#1E3A2F] text-[14px] font-extrabold shadow-[0_6px_16px_rgba(197,155,56,0.28)] hover:brightness-105 disabled:opacity-45 flex items-center justify-center gap-2"
                   >
                     <Send className="w-4 h-4" />
                     <span>

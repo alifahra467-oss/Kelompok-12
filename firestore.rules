@@ -464,6 +464,16 @@ service cloud.firestore {
         data.updatedAt is timestamp;
     }
 
+    function isValidStudentCheckin(data) {
+      return data.keys().hasAll(['checkinId', 'fullName', 'nim', 'targetMode', 'checkedInAt']) &&
+        data.keys().hasOnly(['checkinId', 'fullName', 'nim', 'targetMode', 'checkedInAt']) &&
+        isValidId(data.checkinId) &&
+        data.fullName is string && data.fullName.size() >= 2 && data.fullName.size() <= 60 &&
+        data.nim is string && data.nim.size() >= 3 && data.nim.size() <= 30 &&
+        data.targetMode in ['KUIS_PG', 'SESI_KELAS'] &&
+        data.checkedInAt is timestamp;
+    }
+
     // 1. Course
     match /course/{courseId} {
       allow get: if isValidId(courseId);
@@ -833,6 +843,16 @@ service cloud.firestore {
           incoming().updatedAt == request.time;
         allow delete: if isLecturer() && isValidId(pretestId) && isValidId(docId);
       }
+    }
+
+    // 18. Student Check-ins (Students write on entry; Admin-only read/list/delete)
+    match /student_checkins/{checkinId} {
+      allow get: if isLecturer() && isValidId(checkinId);
+      allow list: if isLecturer() && resource.data.fullName is string;
+      allow create: if isValidId(checkinId) && isValidStudentCheckin(incoming()) &&
+        incoming().checkinId == checkinId &&
+        incoming().checkedInAt == request.time;
+      allow update, delete: if isLecturer() && isValidId(checkinId);
     }
   }
 }

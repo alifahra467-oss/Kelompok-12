@@ -1,10 +1,10 @@
 @import "tailwindcss";
 
 @theme {
-  --font-display: "Outfit", "Plus Jakarta Sans", system-ui, sans-serif;
-  --font-sans: "Plus Jakarta Sans", system-ui, sans-serif;
-  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
-  --font-arabic: "Amiri", "Noto Naskh Arabic", serif;
+  --font-display: "Plus Jakarta Sans", "Noto Sans Arabic", system-ui, sans-serif;
+  --font-sans: "Plus Jakarta Sans", "Noto Sans Arabic", system-ui, sans-serif;
+  --font-mono: "Plus Jakarta Sans", "Noto Sans Arabic", system-ui, sans-serif;
+  --font-arabic: "Plus Jakarta Sans", "Noto Sans Arabic", system-ui, sans-serif;
 
   --color-navy-deep: #0E2142;
   --color-navy-stage: #08142A;
@@ -20,12 +20,13 @@
 }
 
 @layer base {
-  html {
+  html,
+  body {
     font-family: var(--font-sans);
   }
 
   h1, h2, h3, .font-display {
-    font-family: var(--font-display);
+    font-family: var(--font-sans);
   }
 
   .tabular-nums {
@@ -33,8 +34,7 @@
   }
 
   [dir="rtl"], .font-arabic {
-    font-family: var(--font-arabic);
-    line-height: 1.9;
+    font-family: var(--font-sans);
   }
 }
 

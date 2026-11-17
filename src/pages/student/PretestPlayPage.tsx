@@ -347,22 +347,28 @@ export const PretestPlayPage: React.FC = () => {
                   q.answerRevealed && q.revealedAnswer ? (
                     <div
                       key={q.questionId}
-                      className="bg-white rounded-2xl border border-slate-200 p-5 space-y-2.5"
+                      className="bg-white rounded-2xl border border-slate-200 p-5 space-y-3 text-left"
                     >
-                      <div className="text-xs font-bold text-slate-500">
+                      <div className="text-[13px] font-bold text-slate-500 text-left">
                         SOAL #{idx + 1}
                       </div>
                       <ArabicText
+                        as="p"
                         text={q.questionText}
-                        className="text-sm font-bold text-[#0E2142] leading-relaxed"
+                        className="block w-full text-left text-[18px] font-bold text-[#0E2142] leading-[1.6]"
                       />
-                      <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-xs font-bold text-emerald-900">
-                        Kunci Jawaban: <ArabicText text={q.revealedAnswer} className="inline" />
+                      <div className="p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 text-left space-y-1">
+                        <div className="text-[12px] font-bold text-emerald-800">Kunci Jawaban</div>
+                        <ArabicText
+                          as="p"
+                          text={q.revealedAnswer}
+                          className="block w-full text-left text-[15px] font-medium text-emerald-950 leading-[1.55]"
+                        />
                       </div>
                       {q.revealedExplanation && (
-                        <div className="text-xs text-slate-600 leading-relaxed">
+                        <div className="text-[14px] text-slate-600 leading-[1.6] text-left">
                           <span className="font-bold text-[#0E2142]">Pembahasan: </span>
-                          <ArabicText text={q.revealedExplanation} className="inline" />
+                          <ArabicText as="span" text={q.revealedExplanation} className="inline text-left" />
                         </div>
                       )}
                     </div>
@@ -405,22 +411,28 @@ export const PretestPlayPage: React.FC = () => {
                   q.answerRevealed && q.revealedAnswer ? (
                     <div
                       key={q.questionId}
-                      className="bg-white rounded-2xl border border-slate-200 p-5 space-y-2.5"
+                      className="bg-white rounded-2xl border border-slate-200 p-5 space-y-3 text-left"
                     >
-                      <div className="text-xs font-bold text-slate-500">
+                      <div className="text-[13px] font-bold text-slate-500 text-left">
                         SOAL #{idx + 1}
                       </div>
                       <ArabicText
+                        as="p"
                         text={q.questionText}
-                        className="text-sm font-bold text-[#0E2142] leading-relaxed"
+                        className="block w-full text-left text-[18px] font-bold text-[#0E2142] leading-[1.6]"
                       />
-                      <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-xs font-bold text-emerald-900">
-                        Kunci Jawaban: <ArabicText text={q.revealedAnswer} className="inline" />
+                      <div className="p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 text-left space-y-1">
+                        <div className="text-[12px] font-bold text-emerald-800">Kunci Jawaban</div>
+                        <ArabicText
+                          as="p"
+                          text={q.revealedAnswer}
+                          className="block w-full text-left text-[15px] font-medium text-emerald-950 leading-[1.55]"
+                        />
                       </div>
                       {q.revealedExplanation && (
-                        <div className="text-xs text-slate-600 leading-relaxed">
+                        <div className="text-[14px] text-slate-600 leading-[1.6] text-left">
                           <span className="font-bold text-[#0E2142]">Pembahasan: </span>
-                          <ArabicText text={q.revealedExplanation} className="inline" />
+                          <ArabicText as="span" text={q.revealedExplanation} className="inline text-left" />
                         </div>
                       )}
                     </div>
@@ -448,11 +460,12 @@ export const PretestPlayPage: React.FC = () => {
                   </div>
 
                   <ArabicText
+                    as="p"
                     text={q.questionText}
-                    className="text-base font-bold text-[#0E2142] leading-relaxed"
+                    className="block w-full text-left text-[18px] font-bold text-[#0E2142] leading-[1.6]"
                   />
 
-                  <div className="space-y-2.5">
+                  <div className="space-y-3">
                     {q.options.map((opt, optIdx) => {
                       const activeChoice = selected === opt;
                       return (
@@ -463,14 +476,14 @@ export const PretestPlayPage: React.FC = () => {
                           onClick={() =>
                             setDraftChoices((prev) => ({ ...prev, [q.questionId]: opt }))
                           }
-                          className={`w-full min-h-[48px] p-3.5 rounded-xl border text-left text-sm font-semibold flex items-center gap-3 transition-colors disabled:opacity-60 ${
+                          className={`w-full min-h-[54px] px-4 py-3.5 rounded-xl border text-left flex items-start gap-3.5 transition-colors disabled:opacity-60 ${
                             activeChoice
                               ? 'bg-[#0E2142] text-white border-[#0E2142]'
                               : 'bg-slate-50 text-[#0E2142] border-slate-300 hover:bg-slate-100'
                           }`}
                         >
                           <span
-                            className={`w-7 h-7 rounded-lg flex items-center justify-center text-xs font-extrabold shrink-0 ${
+                            className={`w-7 h-7 rounded-lg flex items-center justify-center text-[13px] font-bold shrink-0 mt-0.5 ${
                               activeChoice
                                 ? 'bg-[#F1C56C] text-[#0E2142]'
                                 : 'bg-white border border-slate-300 text-slate-600'
@@ -478,7 +491,11 @@ export const PretestPlayPage: React.FC = () => {
                           >
                             {String.fromCharCode(65 + optIdx)}
                           </span>
-                          <ArabicText text={opt} className="flex-1" />
+                          <ArabicText
+                            as="span"
+                            text={opt}
+                            className="flex-1 min-w-0 block text-left text-[15px] font-medium leading-[1.55]"
+                          />
                         </button>
                       );
                     })}

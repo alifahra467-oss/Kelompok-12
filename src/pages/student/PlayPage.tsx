@@ -417,12 +417,14 @@ export const PlayPage: React.FC = () => {
 
             {/* Pilihan Ganda Question Card */}
             <div className="bg-white rounded-2xl border border-slate-200 p-5 space-y-4">
-              <div className="text-xs font-semibold text-[#2563EB]">
+              <div className="text-[13px] font-bold text-[#2563EB] text-left">
                 Pilihan Ganda · {publicQuestion.topicName}
               </div>
-              <div className="text-lg font-bold text-[#0E2142] leading-relaxed">
-                <ArabicText text={publicQuestion.questionText} />
-              </div>
+              <ArabicText
+                as="p"
+                text={publicQuestion.questionText}
+                className="block w-full text-left text-[18px] font-bold text-[#0E2142] leading-[1.6]"
+              />
 
               {publicQuestion.imageUrl && (
                 <img
@@ -472,7 +474,7 @@ export const PlayPage: React.FC = () => {
                 </div>
               ) : (
                 <form onSubmit={handleSubmit} className="space-y-4 pt-2">
-                  <div className="space-y-2.5">
+                  <div className="space-y-3">
                     {publicQuestion.options!.map((opt, idx) => {
                       const active = selectedOption === opt;
                       return (
@@ -480,14 +482,14 @@ export const PlayPage: React.FC = () => {
                           key={idx}
                           type="button"
                           onClick={() => setSelectedOption(opt)}
-                          className={`w-full min-h-[52px] p-4 rounded-xl border text-left text-sm sm:text-base font-semibold flex items-center gap-3 transition-colors ${
+                          className={`w-full min-h-[54px] px-4 py-3.5 rounded-xl border text-left flex items-start gap-3.5 transition-colors ${
                             active
                               ? 'bg-[#2563EB] text-white border-[#2563EB]'
                               : 'bg-slate-50 text-[#0E2142] border-slate-300 hover:bg-slate-100'
                           }`}
                         >
                           <span
-                            className={`w-7 h-7 rounded-lg font-mono text-xs font-bold flex items-center justify-center shrink-0 ${
+                            className={`w-7 h-7 rounded-lg text-[13px] font-bold flex items-center justify-center shrink-0 mt-0.5 ${
                               active
                                 ? 'bg-white text-[#2563EB]'
                                 : 'bg-white border border-slate-300 text-[#0E2142]'
@@ -495,9 +497,11 @@ export const PlayPage: React.FC = () => {
                           >
                             {String.fromCharCode(65 + idx)}
                           </span>
-                          <span className="flex-1">
-                            <ArabicText text={opt} />
-                          </span>
+                          <ArabicText
+                            as="span"
+                            text={opt}
+                            className="flex-1 min-w-0 block text-left text-[15px] font-medium leading-[1.55]"
+                          />
                         </button>
                       );
                     })}

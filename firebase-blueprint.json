@@ -453,6 +453,19 @@
         "updatedAt": { "type": "string", "format": "date-time" }
       },
       "required": ["docId", "proposedCaptains", "memberScores", "updatedAt"]
+    },
+    "StudentCheckin": {
+      "title": "StudentCheckin",
+      "description": "Student check-in entry recording Nama Lengkap and NIM upon entering the portal (readable only by Admin).",
+      "type": "object",
+      "properties": {
+        "checkinId": { "type": "string", "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "fullName": { "type": "string", "minLength": 2, "maxLength": 60 },
+        "nim": { "type": "string", "minLength": 3, "maxLength": 30 },
+        "targetMode": { "type": "string", "enum": ["KUIS_PG", "SESI_KELAS"] },
+        "checkedInAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["checkinId", "fullName", "nim", "targetMode", "checkedInAt"]
     }
   },
   "firestore": {
@@ -555,6 +568,10 @@
     "/pretests/{pretestId}/admin_state/{docId}": {
       "schema": { "$ref": "#/entities/PretestAdminSummary" },
       "description": "Private admin diagnostic summary and balance report."
+    },
+    "/student_checkins/{checkinId}": {
+      "schema": { "$ref": "#/entities/StudentCheckin" },
+      "description": "Student entry check-ins (Nama Lengkap & NIM) readable exclusively by Admin."
     }
   }
 }

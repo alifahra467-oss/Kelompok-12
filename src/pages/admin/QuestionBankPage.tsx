@@ -881,9 +881,11 @@ export const QuestionBankPage: React.FC = () => {
                 <X className="w-5 h-5" />
               </button>
             </div>
-            <div className="text-xl font-bold leading-relaxed">
-              <ArabicText text={previewQuestion.questionText} />
-            </div>
+            <ArabicText
+              as="p"
+              text={previewQuestion.questionText}
+              className="block w-full text-left text-[18px] font-bold leading-[1.6]"
+            />
             {previewQuestion.imageUrl && (
               <img
                 src={previewQuestion.imageUrl}
@@ -893,13 +895,20 @@ export const QuestionBankPage: React.FC = () => {
               />
             )}
             {previewQuestion.options && previewQuestion.options.length > 0 && (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="space-y-2.5">
                 {previewQuestion.options.map((opt, idx) => (
                   <div
                     key={idx}
-                    className="p-3.5 rounded-xl bg-white/10 border border-white/15 text-sm font-medium"
+                    className="px-4 py-3.5 rounded-xl bg-white/10 border border-white/15 flex items-start gap-3 text-left"
                   >
-                    <ArabicText text={opt} />
+                    <span className="w-7 h-7 rounded-lg bg-white/15 flex items-center justify-center text-[13px] font-bold shrink-0 mt-0.5">
+                      {String.fromCharCode(65 + idx)}
+                    </span>
+                    <ArabicText
+                      as="span"
+                      text={opt}
+                      className="flex-1 min-w-0 block text-left text-[15px] font-medium leading-[1.55]"
+                    />
                   </div>
                 ))}
               </div>

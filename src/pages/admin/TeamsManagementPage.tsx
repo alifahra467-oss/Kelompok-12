@@ -12,6 +12,7 @@ import {
   X,
 } from 'lucide-react';
 import { AdminLayout } from '../../layouts/AdminLayout';
+import { AdminStudentCheckinsPanel } from '../../components/AdminStudentCheckinsPanel';
 import { useAuth } from '../../context/AuthContext';
 import { EmptyState, LoadingState } from '../../components/StatusViews';
 import { db, handleFirestoreError } from '../../lib/firebase';
@@ -121,13 +122,17 @@ export const TeamsManagementPage: React.FC = () => {
     >
       {loading ? (
         <LoadingState label="Memuat data sesi dan tim..." />
-      ) : sessions.length === 0 ? (
-        <EmptyState
-          title="Belum Ada Sesi Kompetisi"
-          description="Buat sesi kompetisi terlebih dahulu di menu Sesi Kompetisi untuk mulai mengelola tim dan peserta."
-        />
       ) : (
         <div className="space-y-6">
+          <AdminStudentCheckinsPanel compact />
+
+          {sessions.length === 0 ? (
+            <EmptyState
+              title="Belum Ada Sesi Kompetisi"
+              description="Buat sesi kompetisi terlebih dahulu di menu Sesi Kompetisi untuk mulai mengelola tim dan peserta."
+            />
+          ) : (
+            <div className="space-y-6">
           {/* Session Picker + Join Lock & QR */}
           <div className="bg-white rounded-2xl border border-slate-200 p-5 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
             <div className="space-y-3 flex-1">
@@ -425,6 +430,8 @@ export const TeamsManagementPage: React.FC = () => {
                   Tambahkan Tim
                 </button>
               </form>
+            </div>
+          )}
             </div>
           )}
         </div>

@@ -20,6 +20,7 @@ import {
 import {
   formatStudentDisplayName,
   loadStudentProfile,
+  recordStudentCheckin,
   saveStudentProfile,
 } from '../../lib/studentProfile';
 import { OperationType, type Session, type Team } from '../../types/arena';
@@ -174,6 +175,13 @@ export const JoinPage: React.FC = () => {
     if (pretest) {
       if (displayName.trim().length < 2) return;
       saveStudentProfile({ fullName: displayName.trim(), nim: studentNim.trim() });
+      if (studentNim.trim().length >= 3) {
+        void recordStudentCheckin({
+          fullName: displayName.trim(),
+          nim: studentNim.trim(),
+          targetMode: 'SESI_KELAS',
+        });
+      }
       setJoining(true);
       setErrorMsg(null);
       try {
@@ -192,6 +200,13 @@ export const JoinPage: React.FC = () => {
 
     if (!session || !selectedTeamId || displayName.trim().length < 2) return;
     saveStudentProfile({ fullName: displayName.trim(), nim: studentNim.trim() });
+    if (studentNim.trim().length >= 3) {
+      void recordStudentCheckin({
+        fullName: displayName.trim(),
+        nim: studentNim.trim(),
+        targetMode: 'SESI_KELAS',
+      });
+    }
     setJoining(true);
     setErrorMsg(null);
     try {
@@ -211,32 +226,38 @@ export const JoinPage: React.FC = () => {
   const totalOpenRooms = openPretests.length + openSessions.length;
 
   return (
-    <div className="min-h-screen bg-[#FAF8F5] text-[#1E3A2F] flex flex-col">
+    <div
+      className="min-h-[100dvh] text-[#0B2A4A] flex flex-col"
+      style={{
+        background:
+          'linear-gradient(135deg, #E8FAF3 0%, #EDF4FF 52%, #FFF7EA 100%)',
+      }}
+    >
       {/* Top Bar */}
-      <header className="border-b border-[#1B5E4B]/15 bg-white">
-        <div className="max-w-6xl mx-auto px-5 sm:px-10 h-16 flex items-center justify-between gap-6">
-          <Link to="/" className="flex items-center gap-3 min-w-0 whitespace-nowrap shrink-0">
+      <header className="bg-gradient-to-r from-[#0B2A4A] via-[#0F4C5C] to-[#1B5E4B] text-white border-b border-white/15 shadow-[0_6px_20px_rgba(11,42,74,0.14)] sticky top-0 z-20">
+        <div className="max-w-6xl mx-auto px-4 sm:px-8 lg:px-10 h-14 sm:h-16 flex items-center justify-between gap-4 sm:gap-6">
+          <Link to="/" className="flex items-center gap-2.5 sm:gap-3 min-w-0 whitespace-nowrap shrink-0">
             <img
-              src="/src/assets/images/stiu_emblem_notext_1794928187045.jpg"
+              src="/assets/aistudio/6d10c951-fc5f-4e1d-b919-a6f0372576d5_removalai_preview__1__22e3f2ea.png"
               alt="Logo STIU Darul Hikmah"
               referrerPolicy="no-referrer"
-              className="w-9 h-9 rounded-xl object-cover border border-[#1B5E4B]/20 bg-[#E2EFEA] shrink-0"
+              className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl object-contain bg-white p-0.5 shadow-sm border border-white/40 shrink-0"
             />
-            <span className="font-display text-base font-extrabold tracking-tight text-[#1B5E4B] truncate">
+            <span className="font-display text-sm sm:text-base font-extrabold tracking-tight text-white truncate">
               STIU Darul Hikmah
             </span>
           </Link>
 
-          <nav className="flex items-center gap-6 text-sm font-semibold">
+          <nav className="flex items-center gap-3 sm:gap-6 text-xs sm:text-sm font-semibold">
             <Link
               to="/"
-              className="text-slate-600 hover:text-[#1B5E4B] hover:underline underline-offset-4 transition-colors whitespace-nowrap shrink-0"
+              className="min-h-[40px] flex items-center text-white/90 hover:text-[#FDE047] hover:underline underline-offset-4 transition-colors whitespace-nowrap shrink-0"
             >
               Masuk Awal
             </Link>
             <Link
               to="/admin"
-              className="bg-gradient-to-br from-[#2E7D67] to-[#1B5E4B] text-white px-4 py-2 rounded-full text-xs font-bold hover:brightness-105 transition-all whitespace-nowrap shrink-0"
+              className="min-h-[40px] flex items-center bg-gradient-to-br from-[#FDE047] to-[#EAB308] text-[#0B2A4A] px-4 py-2 rounded-full text-xs font-extrabold hover:brightness-105 transition-all whitespace-nowrap shrink-0"
             >
               Admin
             </Link>
@@ -247,8 +268,8 @@ export const JoinPage: React.FC = () => {
       {/* Main Responsive Split Workspace */}
       <main className="flex-1 grid grid-cols-1 lg:grid-cols-12 items-stretch">
         {/* Left: Primary Direct Student Entry */}
-        <section className="lg:col-span-7 flex items-center justify-center px-5 sm:px-10 lg:px-16 py-10 lg:py-16">
-          <div className="max-w-lg w-full space-y-6">
+        <section className="lg:col-span-7 flex items-center justify-center px-4 sm:px-8 md:px-12 lg:px-16 py-7 sm:py-10 lg:py-16">
+          <div className="max-w-lg md:max-w-xl lg:max-w-lg w-full space-y-6">
             <div className="space-y-2">
               <p className="text-sm font-bold text-[#2E7D67]">Portal Mahasiswi · STIU Darul Hikmah</p>
               <h1

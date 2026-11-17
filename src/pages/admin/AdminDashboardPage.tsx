@@ -41,6 +41,10 @@ import {
 } from '../../types/arena';
 import type { Pretest } from '../../types/pretest';
 import { LoadingState } from '../../components/StatusViews';
+import {
+  AdminStudentCheckinsPanel,
+  type QuizAttemptSummary,
+} from '../../components/AdminStudentCheckinsPanel';
 
 export const AdminDashboardPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
@@ -69,17 +73,7 @@ export const AdminDashboardPage: React.FC = () => {
   const [saving, setSaving] = useState(false);
   const [seeding, setSeeding] = useState(false);
   const [seedingUq, setSeedingUq] = useState(false);
-  const [uqAttempts, setUqAttempts] = useState<
-    Array<{
-      attemptId: string;
-      studentName: string;
-      studentNim?: string;
-      totalCorrect: number;
-      totalQuestions: number;
-      percentage: number;
-      submittedAtMs: number;
-    }>
-  >([]);
+  const [uqAttempts, setUqAttempts] = useState<QuizAttemptSummary[]>([]);
 
   const { user, isLecturer, authLoading } = useAuth();
 
@@ -301,6 +295,9 @@ export const AdminDashboardPage: React.FC = () => {
               </div>
             </div>
           </div>
+
+          {/* Daftar Mahasiswi yang Masuk (Nama Lengkap & NIM — Khusus Admin) */}
+          <AdminStudentCheckinsPanel quizAttempts={uqAttempts} />
 
           {/* Unified Admin Visibility Hub: Nilai PG + Spinner + Cerdas Cermat */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

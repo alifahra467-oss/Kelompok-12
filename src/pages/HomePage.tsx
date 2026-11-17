@@ -2,7 +2,14 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { listOpenSessions } from '../services/firestoreService';
 import { listOpenPretests } from '../services/pretestService';
-import { loadStudentProfile, saveStudentProfile } from '../lib/studentProfile';
+import {
+  loadStudentProfile,
+  recordStudentCheckin,
+  saveStudentProfile,
+} from '../lib/studentProfile';
+
+const STIU_LOGO_SRC =
+  '/assets/aistudio/6d10c951-fc5f-4e1d-b919-a6f0372576d5_removalai_preview__1__22e3f2ea.png';
 
 export const HomePage: React.FC = () => {
   const navigate = useNavigate();
@@ -11,6 +18,7 @@ export const HomePage: React.FC = () => {
   const [fullName, setFullName] = useState(existing?.fullName ?? '');
   const [nim, setNim] = useState(existing?.nim ?? '');
   const [entering, setEntering] = useState(false);
+  const [logoError, setLogoError] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const handleEnterApp = async (e: React.FormEvent) => {
@@ -23,7 +31,7 @@ export const HomePage: React.FC = () => {
       return;
     }
     if (cleanNim.length < 3) {
-      setErrorMsg('Masukkan NIM yang valid.');
+      setErrorMsg('Masukkan NIM yang valid (minimal 3 karakter).');
       return;
     }
 
@@ -37,43 +45,70 @@ export const HomePage: React.FC = () => {
         listOpenSessions().catch(() => []),
       ]);
 
-      if (openPretests.length > 0 || openSessions.length > 0) {
-        navigate('/join');
-      } else {
-        navigate('/kuis-pg');
-      }
+      const hasLiveRoom = openPretests.length > 0 || openSessions.length > 0;
+      const targetMode = hasLiveRoom ? 'SESI_KELAS' : 'KUIS_PG';
+
+      await recordStudentCheckin({
+        fullName: cleanName,
+        nim: cleanNim,
+        targetMode,
+      });
+
+      navigate(hasLiveRoom ? '/join' : '/kuis-pg');
     } finally {
       setEntering(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-[#FAF8F5] text-[#1E3A2F] flex flex-col items-center justify-center relative p-5">
-      {/* Tombol Admin di Pojok Kanan Atas */}
+    <div
+      className="min-h-[100dvh] text-[#0B2A4A] flex flex-col items-center justify-center relative px-4 pt-20 pb-8 sm:px-6 sm:pt-24 sm:pb-12 lg:px-10 overflow-x-hidden"
+      style={{
+        background:
+          'radial-gradient(circle at 12% 18%, rgba(110, 231, 183, 0.55) 0%, transparent 45%), radial-gradient(circle at 88% 16%, rgba(125, 211, 252, 0.55) 0%, transparent 48%), radial-gradient(circle at 82% 86%, rgba(253, 224, 71, 0.35) 0%, transparent 44%), radial-gradient(circle at 18% 85%, rgba(196, 181, 253, 0.42) 0%, transparent 46%), linear-gradient(135deg, #E0F9F1 0%, #E6F0FF 52%, #FFF3E2 100%)',
+      }}
+    >
+      {/* Tekstur titik halus khas editorial kampus */}
+      <div
+        aria-hidden="true"
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          backgroundImage: 'radial-gradient(rgba(11, 42, 74, 0.06) 1px, transparent 1px)',
+          backgroundSize: '26px 26px',
+        }}
+      />
+
+      {/* Tombol Admin di Pojok Kanan Atas — responsif HP, iPad, & Laptop */}
       <Link
         to="/admin"
-        className="absolute top-6 right-6 bg-gradient-to-br from-[#2E7D67] to-[#1B5E4B] text-white font-bold text-sm px-6 py-2.5 rounded-full shadow-[0_6px_15px_rgba(27,94,75,0.25)] border border-white/30 hover:-translate-y-0.5 hover:shadow-[0_8px_20px_rgba(27,94,75,0.35)] transition-all whitespace-nowrap shrink-0"
+        className="absolute top-4 right-4 sm:top-6 sm:right-6 lg:top-7 lg:right-8 z-20 min-h-[44px] flex items-center justify-center bg-gradient-to-br from-[#0B2A4A] to-[#1B5E4B] text-white font-bold text-xs sm:text-sm px-5 sm:px-6 py-2.5 rounded-full shadow-[0_8px_20px_rgba(11,42,74,0.2)] border border-white/50 hover:-translate-y-0.5 hover:shadow-[0_12px_24px_rgba(11,42,74,0.28)] transition-all whitespace-nowrap shrink-0"
       >
         Admin
       </Link>
 
-      {/* Kartu Utama */}
-      <main className="w-full max-w-[400px] min-h-[460px] bg-[#E2EFEA] rounded-[32px] px-7 pt-10 pb-14 flex flex-col justify-center items-center relative overflow-hidden shadow-[0_15px_35px_rgba(46,125,103,0.12)] border-2 border-white">
-        {/* Watermark Logo STIU Darul Hikmah di Latar Belakang Kartu */}
+      {/* Kartu Utama — menyesuaikan proporsi HP, iPad (tablet), dan Laptop */}
+      <main className="w-full max-w-[380px] sm:max-w-[440px] md:max-w-[470px] lg:max-w-[490px] min-h-[440px] sm:min-h-[500px] lg:min-h-[530px] bg-white/60 backdrop-blur-2xl rounded-[28px] sm:rounded-[34px] px-5 pt-10 pb-14 sm:px-8 sm:pt-12 sm:pb-16 lg:px-10 lg:pt-14 lg:pb-16 flex flex-col justify-center items-center relative overflow-hidden z-[2] shadow-[0_24px_60px_rgba(11,42,74,0.12)] border-2 border-white">
+        {/* Watermark Logo STIU Darul Hikmah memenuhi kotak background masuk */}
         <div
           aria-hidden="true"
-          className="absolute inset-0 flex items-center justify-center pointer-events-none z-[1]"
+          className="absolute inset-2 sm:inset-3 flex items-center justify-center pointer-events-none z-[1]"
         >
-          <img
-            src="/src/assets/images/stiu_emblem_notext_1794928187045.jpg"
-            alt=""
-            referrerPolicy="no-referrer"
-            className="w-[88%] h-[88%] object-contain opacity-[0.22] mix-blend-multiply select-none"
-          />
+          {!logoError ? (
+            <img
+              src={STIU_LOGO_SRC}
+              alt=""
+              referrerPolicy="no-referrer"
+              onError={() => setLogoError(true)}
+              className="w-full h-full object-contain opacity-[0.4] mix-blend-multiply select-none"
+            />
+          ) : null}
         </div>
 
         {/* Form Login Mahasiswi */}
-        <form onSubmit={handleEnterApp} className="w-full flex flex-col gap-5 relative z-[2]">
+        <form
+          onSubmit={handleEnterApp}
+          className="w-full flex flex-col gap-4 sm:gap-5 relative z-[2]"
+        >
           {errorMsg && (
             <div className="px-4 py-2.5 rounded-2xl bg-rose-50/95 border border-rose-200 text-xs font-semibold text-rose-800 text-center">
               {errorMsg}
@@ -92,7 +127,7 @@ export const HomePage: React.FC = () => {
               minLength={2}
               maxLength={60}
               autoComplete="name"
-              className="w-full px-[26px] py-[18px] rounded-[24px] border-0 bg-gradient-to-br from-[#2E7D67] to-[#1B5E4B] text-white placeholder:text-white/75 text-lg font-bold shadow-[0_8px_18px_rgba(27,94,75,0.25)] outline-none focus:-translate-y-0.5 focus:ring-2 focus:ring-[#D4AF37] focus:shadow-[0_10px_22px_rgba(27,94,75,0.38)] transition-all"
+              className="w-full min-h-[54px] px-5 py-3.5 sm:px-6 sm:py-[17px] rounded-[20px] sm:rounded-[22px] border border-white/30 bg-gradient-to-br from-[#0B2A4A]/95 via-[#0F4C5C]/95 to-[#1B5E4B]/95 text-white placeholder:text-white/80 text-base sm:text-[17px] font-bold shadow-[0_10px_22px_rgba(11,42,74,0.18)] outline-none focus:-translate-y-0.5 focus:ring-2 focus:ring-[#38BDF8] focus:shadow-[0_12px_26px_rgba(11,42,74,0.26)] transition-all"
             />
           </div>
 
@@ -108,29 +143,19 @@ export const HomePage: React.FC = () => {
               minLength={3}
               maxLength={30}
               inputMode="numeric"
-              className="w-full px-[26px] py-[18px] rounded-[24px] border-0 bg-gradient-to-br from-[#2E7D67] to-[#1B5E4B] text-white placeholder:text-white/75 text-lg font-bold tabular-nums shadow-[0_8px_18px_rgba(27,94,75,0.25)] outline-none focus:-translate-y-0.5 focus:ring-2 focus:ring-[#D4AF37] focus:shadow-[0_10px_22px_rgba(27,94,75,0.38)] transition-all"
+              className="w-full min-h-[54px] px-5 py-3.5 sm:px-6 sm:py-[17px] rounded-[20px] sm:rounded-[22px] border border-white/30 bg-gradient-to-br from-[#0B2A4A]/95 via-[#0F4C5C]/95 to-[#1B5E4B]/95 text-white placeholder:text-white/80 text-base sm:text-[17px] font-bold tabular-nums shadow-[0_10px_22px_rgba(11,42,74,0.18)] outline-none focus:-translate-y-0.5 focus:ring-2 focus:ring-[#38BDF8] focus:shadow-[0_12px_26px_rgba(11,42,74,0.26)] transition-all"
             />
           </div>
 
           <button
             type="submit"
             disabled={entering}
-            className="mt-2 w-full px-[26px] py-4 rounded-[24px] border-0 bg-gradient-to-br from-[#DFBD69] to-[#C59B38] text-[#1E3A2F] text-[17px] font-extrabold tracking-[0.5px] cursor-pointer shadow-[0_8px_18px_rgba(197,155,56,0.3)] hover:-translate-y-0.5 hover:brightness-[1.04] hover:shadow-[0_10px_22px_rgba(197,155,56,0.4)] active:translate-y-0 transition-all disabled:opacity-60"
+            className="mt-1 sm:mt-2 w-full min-h-[52px] px-6 py-3.5 sm:py-4 rounded-[20px] sm:rounded-[22px] border border-amber-200/80 bg-gradient-to-br from-[#FDE047] via-[#FACC15] to-[#EAB308] text-[#0B2A4A] text-base sm:text-[17px] font-extrabold tracking-[0.4px] cursor-pointer shadow-[0_10px_24px_rgba(234,179,8,0.28)] hover:-translate-y-0.5 hover:brightness-[1.03] hover:shadow-[0_14px_28px_rgba(234,179,8,0.38)] active:translate-y-0 transition-all disabled:opacity-60"
           >
             {entering ? 'Memasuki Aplikasi...' : 'Masuk'}
           </button>
         </form>
-
-        <div className="absolute bottom-[18px] z-[2] text-[13px] font-extrabold tracking-[1.2px] text-[#1B5E4B] uppercase opacity-85">
-          STIU Darul Hikmah
-        </div>
       </main>
-
-      <div className="mt-5 flex items-center gap-4 text-xs font-semibold text-[#1B5E4B]/80">
-        <Link to="/join" className="hover:text-[#1B5E4B] hover:underline underline-offset-4">
-          Masuk dengan Kode Sesi / Bel Rebutan
-        </Link>
-      </div>
     </div>
   );
 };

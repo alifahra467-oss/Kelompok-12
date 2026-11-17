@@ -80,10 +80,10 @@ export const RequireAdmin: React.FC<{ children: React.ReactNode }> = ({ children
           <div className="space-y-8">
             <Link to="/" className="inline-flex items-center gap-3 whitespace-nowrap shrink-0">
               <img
-                src="/src/assets/images/stiu_emblem_notext_1794928187045.jpg"
+                src="/assets/aistudio/6d10c951-fc5f-4e1d-b919-a6f0372576d5_removalai_preview__1__22e3f2ea.png"
                 alt="Logo STIU Darul Hikmah"
                 referrerPolicy="no-referrer"
-                className="w-10 h-10 rounded-xl object-cover border border-white/25 bg-[#E2EFEA] shrink-0"
+                className="w-11 h-11 rounded-xl object-contain bg-white p-1 border border-white/40 shrink-0"
               />
               <span className="font-display text-lg font-extrabold tracking-tight">
                 STIU Darul Hikmah
